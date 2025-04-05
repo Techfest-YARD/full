@@ -43,23 +43,25 @@ gemini_service = GeminiService()
 gemini_llm = GeminiLLM(gemini_service=gemini_service)
 
 
-embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-vectorstore = PGVector(
-    connection_string="postgresql://postgres:test@35.246.200.139/vectorstore",
-    embedding_function=embedding_model,
-    collection_name="embeddings"
-)
-retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 3})
 
 
 class RagPipelineService:
     def __init__(self):
-        self.retriever = retriever
+        # self.retriever = retriever
         self.llm = gemini_llm
         self.prompt_template = prompt_template
 
     def run(self, query: str):
-        retrieved_docs = self.retriever.get_relevant_documents(query)
+        embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+        vectorstore = PGVector(
+            connection_string="postgresql://postgres:test@35.246.200.139/vectorstore",
+            embedding_function=embedding_model,
+            collection_name="embeddings"
+        )
+        retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 3})
+
+
+        retrieved_docs = retriever.get_relevant_documents(query)
         context = "\n".join([doc.page_content for doc in retrieved_docs])
 
         prompt = self.prompt_template.format(context=context, question=query)
