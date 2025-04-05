@@ -1,22 +1,36 @@
-import os
 import streamlit as st
 import datetime
 
-# --- Configuration Constants ---
-CONTEXT_FILE = "context.txt"  # File with your study material
+# --- Inline Learning Material ---
+context_data = """
+Getting Started with Git
+-------------------------
+This chapter covers the basics of Git. You will learn about version control, installing Git, and getting started with managing your source code.
+
+About Version Control
+---------------------
+Version control records changes to files over time, allowing you to recall specific versions later. It is essential for collaboration and recovery.
+
+Local and Centralized VCS
+-------------------------
+Local VCS methods (such as copying files) can be error prone, while centralized systems (like CVS or Subversion) manage changes on a single server, which may create a single point of failure.
+
+Distributed Version Control Systems
+-------------------------------------
+Distributed systems like Git give each user a full copy of the repository, increasing reliability and flexibility.
+
+A Short History of Git
+----------------------
+Git was created by Linus Torvalds in 2005 for the Linux kernel project. It is renowned for its speed, efficiency, and robust branching capabilities.
+"""
 
 # --- Utility Functions ---
 
-def read_context(file_path: str) -> str:
+def read_context(dummy_path: str) -> str:
     """
-    Reads and returns the full text from the context file.
+    Instead of reading from a file, return the inline learning material.
     """
-    try:
-        with open(file_path, "r", encoding="utf-8") as f:
-            return f.read().strip()
-    except Exception as e:
-        st.error(f"Error reading context: {e}")
-        return ""
+    return context_data.strip()
 
 def generate_topics(context: str) -> list:
     """
@@ -82,7 +96,7 @@ def run_curious_child_chat():
     # If topics are not generated, show a button to generate them.
     if not st.session_state.topics:
         if st.button("Generate topics to discuss"):
-            context = read_context(CONTEXT_FILE)
+            context = read_context("dummy_path_not_used")
             if context:
                 topics = generate_topics(context)
                 st.session_state.topics = topics
@@ -94,8 +108,8 @@ def run_curious_child_chat():
                 # Add the initial assistant message.
                 st.session_state.messages.append({"role": "assistant", "content": st.session_state.conversation_memory})
             else:
-                st.error("Failed to read the study material.")
-        return  # wait for user action
+                st.error("Failed to load the study material.")
+        return  # Wait for user action
 
     # Display current topic information.
     current_topic = st.session_state.topics[st.session_state.current_topic_index]
