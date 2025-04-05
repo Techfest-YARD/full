@@ -8,75 +8,57 @@ import streamlit.components.v1 as components
 # --- Configuration ---
 FLASHCARD_DIR = "/home/flashacrd"  # Target directory for JSON files
 
-# Inline context data to use instead of reading from a file.
+# Inline Git-related context data.
 context_data = """
-Getting Started with Git
--------------------------
-This chapter covers the basics of Git. You will learn about version control, installing Git, and getting started with managing your source code.
-
-About Version Control
----------------------
-Version control is a system that records changes to files over time, allowing you to recall specific versions later. It is essential for collaboration, tracking changes, and recovering previous states.
-
-Local and Centralized VCS
--------------------------
-Local version control involves making manual backups of files, which can be error prone. Centralized systems (like CVS or Subversion) use a single server to manage changes, but this creates a single point of failure.
-
-Distributed Version Control Systems
--------------------------------------
-Distributed systems, such as Git, allow each user to have a full copy of the repository. This approach increases reliability and makes collaboration more flexible.
-
-A Short History of Git
-----------------------
-Git was created by Linus Torvalds in 2005 for the Linux kernel project. It is renowned for its speed, efficiency with large projects, and robust branching capabilities.
-
-Git Fundamentals
-----------------
-- Snapshots, Not Differences: Git stores complete snapshots of your files rather than just the changes.
-- Local Operations: Most Git operations work entirely on your local machine, ensuring speed and offline capability.
-- Data Integrity: Git uses SHA-1 hashing to maintain data integrity.
-- Three States: Files in Git can be Modified, Staged, or Committed.
-
-Basic Git Workflow
-------------------
-1. Modify files in your working directory.
-2. Stage the changes you want to include in your next commit.
-3. Commit the staged changes to save a snapshot of your project.
-
-This overview serves as a quick and simple context for testing the app.
+Git is a distributed version control system that helps manage source code history.
+Git allows you to track changes, collaborate with others, and experiment without fear.
+Basic Git Commands:
+- git init: Initializes a new Git repository.
+- git add: Stages changes to be committed.
+- git commit: Records the staged changes to the repository.
+- git push: Sends your commits to a remote repository.
+- git pull: Retrieves and merges changes from a remote repository.
+Git Branching:
+- git branch: Lists, creates, or deletes branches.
+- git checkout: Switches branches or restores working tree files.
+- git merge: Integrates changes from different branches.
+Git Log and History:
+- git log: Displays commit history.
+- git diff: Shows differences between commits or the working directory and commits.
+Understanding these concepts is essential for efficient source code management.
 """
 
 # --- Utility Functions ---
 
-def read_context(file_path: str) -> str:
+def read_context(dummy_path: str) -> str:
     """
     Instead of reading from a file, return the inline context_data.
     """
-    return context_data
+    return context_data.strip()
 
 def generate_flashcards(context: str) -> list:
     """
-    Uses the provided context to generate up to 20 flashcards.
-    This is a stub for the Gemini API call.
+    Uses the provided context to generate up to 20 Git-related flashcards.
     Each flashcard is a dict with keys: 'card_id', 'side1', 'side2'.
+    For demonstration, the context is split into sentences.
     """
-    # Split context into sentences for demonstration.
     sentences = context.split(".")
     flashcards = []
     for idx, sentence in enumerate(sentences):
         sentence = sentence.strip()
         if sentence and len(flashcards) < 20:
+            # Create a flashcard with a Git question and its explanation.
             flashcards.append({
                 "card_id": str(idx + 1),
                 "side1": f"Q: What does this mean? '{sentence}'",
-                "side2": f"A: Explanation for '{sentence}'"
+                "side2": f"A: Explanation: '{sentence}'."
             })
     # If no valid sentence found, add a default flashcard.
     if not flashcards:
         flashcards.append({
             "card_id": "1",
-            "side1": "Q: What is a flashcard?",
-            "side2": "A: A flashcard is a card for learning."
+            "side1": "Q: What is Git?",
+            "side2": "A: Git is a distributed version control system for tracking changes in source code."
         })
     return flashcards
 
@@ -183,10 +165,10 @@ def display_flashcards_ui(flashcards: list):
 def run_pipeline():
     """
     The main pipeline:
-    1. Get the context from the inline string.
-    2. Generate flashcards via a Gemini stub.
-    3. Save flashcards with computed hash.
-    4. Load flashcards and display the flashcards UI.
+      1. Get the context from the inline string.
+      2. Generate flashcards via a Gemini stub.
+      3. Save flashcards with computed hash.
+      4. Load flashcards and display the flashcards UI.
     """
     # Get the inline context.
     context = read_context("dummy_path_not_used")
@@ -198,7 +180,7 @@ def run_pipeline():
     saved_file = save_flashcards(flashcards)
     st.info(f"Flashcards generated and saved to: {saved_file}")
 
-    # For the UI, we load the flashcards from the file.
+    # For the UI, load the flashcards from the file.
     try:
         loaded_flashcards = load_flashcards(saved_file)
     except Exception as e:
@@ -210,9 +192,8 @@ def run_pipeline():
 
 # --- Main Application ---
 st.set_page_config(page_title="Dynamic Flashcards", page_icon="📚", layout="wide")
-
 st.title("Dynamic Flashcards Application")
-st.markdown("This app generates flashcards from an inline context using a Gemini stub and then displays them for review.")
+st.markdown("This app generates Git-related flashcards from an inline context using a Gemini stub and then displays them for review.")
 
 # Button to start the generation pipeline.
 if st.button("Generate Flashcards"):
@@ -225,3 +206,4 @@ if st.button("Generate Flashcards"):
 # If flashcards have been generated, display them.
 if 'cards' in st.session_state:
     display_flashcards_ui(st.session_state.cards)
+
