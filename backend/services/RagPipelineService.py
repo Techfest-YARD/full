@@ -47,8 +47,7 @@ embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-Mi
 vectorstore = PGVector(
     connection_string="postgresql://postgres:test@35.246.200.139/vectorstore",
     embedding_function=embedding_model,
-    table_name="embeddings",
-    vector_column="embedding"
+    collection_name="embeddings"
 )
 retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 3})
 

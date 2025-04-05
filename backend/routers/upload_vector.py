@@ -6,6 +6,7 @@ import sqlalchemy
 from google.cloud.sql.connector import Connector, IPTypes
 import pymysql
 import numpy as np
+import psycopg2
 
 router = APIRouter(prefix="/upload_vector", tags=["upload_vector"])
 
