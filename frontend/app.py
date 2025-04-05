@@ -9,7 +9,6 @@ st.set_page_config(page_title="TechFest RAG", page_icon="🤖", layout="wide")
 # --- OAuth Configuration ---
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
-# This redirect URI must be registered in your Google Console.
 REDIRECT_URI = "https://frontend-46193761155.europe-west3.run.app/oauth2callback"  
 AUTHORIZATION_ENDPOINT = "https://accounts.google.com/o/oauth2/v2/auth"
 TOKEN_ENDPOINT = "https://oauth2.googleapis.com/token"
@@ -22,7 +21,7 @@ if "oauth_state" not in st.session_state:
     st.session_state.oauth_state = None
 
 # --- Automatic Code Retrieval from URL ---
-query_params = st.query_params()
+query_params = st.query_params  # st.query_params is now a property, not callable
 if "code" in query_params and st.session_state.user is None:
     code = query_params["code"][0]
     oauth = OAuth2Session(
@@ -35,7 +34,7 @@ if "code" in query_params and st.session_state.user is None:
     response = oauth.get(USERINFO_ENDPOINT)
     user_info = response.json()
     st.session_state.user = user_info
-    # Clear the query parameters so code isn't re-processed on refresh.
+    # Clear query parameters so the code isn't re-processed on refresh.
     st.set_query_params()
 
 # --- Top-Right Permanent Login/Logout Panel ---
