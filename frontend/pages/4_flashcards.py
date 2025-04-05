@@ -7,26 +7,60 @@ import streamlit.components.v1 as components
 
 # --- Configuration ---
 FLASHCARD_DIR = "/home/flashacrd"  # Target directory for JSON files
-CONTEXT_FILE = "context.txt"       # File storing the knowledge context
+
+# Inline context data to use instead of reading from a file.
+context_data = """
+Getting Started with Git
+-------------------------
+This chapter covers the basics of Git. You will learn about version control, installing Git, and getting started with managing your source code.
+
+About Version Control
+---------------------
+Version control is a system that records changes to files over time, allowing you to recall specific versions later. It is essential for collaboration, tracking changes, and recovering previous states.
+
+Local and Centralized VCS
+-------------------------
+Local version control involves making manual backups of files, which can be error prone. Centralized systems (like CVS or Subversion) use a single server to manage changes, but this creates a single point of failure.
+
+Distributed Version Control Systems
+-------------------------------------
+Distributed systems, such as Git, allow each user to have a full copy of the repository. This approach increases reliability and makes collaboration more flexible.
+
+A Short History of Git
+----------------------
+Git was created by Linus Torvalds in 2005 for the Linux kernel project. It is renowned for its speed, efficiency with large projects, and robust branching capabilities.
+
+Git Fundamentals
+----------------
+- Snapshots, Not Differences: Git stores complete snapshots of your files rather than just the changes.
+- Local Operations: Most Git operations work entirely on your local machine, ensuring speed and offline capability.
+- Data Integrity: Git uses SHA-1 hashing to maintain data integrity.
+- Three States: Files in Git can be Modified, Staged, or Committed.
+
+Basic Git Workflow
+------------------
+1. Modify files in your working directory.
+2. Stage the changes you want to include in your next commit.
+3. Commit the staged changes to save a snapshot of your project.
+
+This overview serves as a quick and simple context for testing the app.
+"""
 
 # --- Utility Functions ---
 
 def read_context(file_path: str) -> str:
     """
-    Reads and returns the content from a context file.
+    Instead of reading from a file, return the inline context_data.
     """
-    with open(file_path, "r", encoding="utf-8") as f:
-        return f.read().strip()
+    return context_data
 
 def generate_flashcards(context: str) -> list:
     """
     Uses the provided context to generate up to 20 flashcards.
     This is a stub for the Gemini API call.
     Each flashcard is a dict with keys: 'card_id', 'side1', 'side2'.
-    Replace this stub with an actual API call if needed.
     """
-    # For demonstration, we create dummy flashcards based on the context.
-    # Split context into sentences (or use another method to generate Q/A).
+    # Split context into sentences for demonstration.
     sentences = context.split(".")
     flashcards = []
     for idx, sentence in enumerate(sentences):
@@ -149,18 +183,14 @@ def display_flashcards_ui(flashcards: list):
 def run_pipeline():
     """
     The main pipeline:
-    1. Read context.
-    2. Generate flashcards via Gemini stub.
+    1. Get the context from the inline string.
+    2. Generate flashcards via a Gemini stub.
     3. Save flashcards with computed hash.
     4. Load flashcards and display the flashcards UI.
     """
-    # Read the knowledge context.
-    try:
-        context = read_context(CONTEXT_FILE)
-    except Exception as e:
-        st.error(f"Error reading context file: {e}")
-        return
-
+    # Get the inline context.
+    context = read_context("dummy_path_not_used")
+    
     # Generate flashcards using the context.
     flashcards = generate_flashcards(context)
     
@@ -182,7 +212,7 @@ def run_pipeline():
 st.set_page_config(page_title="Dynamic Flashcards", page_icon="📚", layout="wide")
 
 st.title("Dynamic Flashcards Application")
-st.markdown("This app generates flashcards from a context file using Gemini (stub) and then displays them for review.")
+st.markdown("This app generates flashcards from an inline context using a Gemini stub and then displays them for review.")
 
 # Button to start the generation pipeline.
 if st.button("Generate Flashcards"):
