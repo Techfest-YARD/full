@@ -68,8 +68,8 @@ class RagPipelineService:
         answer = self.llm(prompt)
         return answer
 
-rag_pipeline = RagPipelineService()
+# rag_pipeline = RagPipelineService()
 
-query = "Czym zajmuje się twoj_plik.txt?"
-response = rag_pipeline.run(query)
-print(response)
+# query = "Czym zajmuje się twoj_plik.txt?"
+# response = rag_pipeline.run(query)
+# print(response)
