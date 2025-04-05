@@ -1,0 +1,71 @@
+/tech_env
+/venv
+
+.env
+
+.idea/
+tech_env_backend/
+.tech_env_backend/
+
+/venv
+
+__pycache__/
+*.py[cod]
+
+# Pliki tymczasowe
+*.tmp
+*.swp
+*.swo
+*.bak
+
+# ---------------------
+# PyCharm / IntelliJ
+# ---------------------
+.idea/
+
+# ---------------------
+# VSCode
+# ---------------------
+.vscode/
+
+# ---------------------
+# Jupyter Notebook
+# ---------------------
+.ipynb_checkpoints/
+
+# ---------------------
+# Systemowe
+# ---------------------
+.DS_Store
+Thumbs.db
+
+# ---------------------
+# Test coverage / raporty
+# ---------------------
+htmlcov/
+.coverage
+.tox/
+nosetests.xml
+coverage.xml
+*.cover
+.cache/
+.pytest_cache/
+
+# ---------------------
+# dotenv / tajne dane
+# ---------------------
+*.env
+.env.*
+!env.example
+
+# ---------------------
+# MyPy / Typowanie
+# ---------------------
+.mypy_cache/
+.dmypy.json
+
+# ---------------------
+# Profilowanie
+# ---------------------
+profile_default/
+ipython_config.py
