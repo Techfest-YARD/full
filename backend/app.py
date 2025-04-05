@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import chat, upload
+from routers import chat, upload, test
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
@@ -21,10 +21,11 @@ FRONTEND_URL = os.getenv("FRONTEND_URL")
 app = FastAPI()
 app.include_router(chat.router)
 app.include_router(upload.router)
+app.include_router(test.router)
 
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=[FRONTEND_URL],
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
