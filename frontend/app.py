@@ -19,7 +19,7 @@ if "oauth_state" not in st.session_state:
     st.session_state.oauth_state = None
 
 # --- Automatic Code Retrieval from URL ---
-query_params = st.experimental_get_query_params()
+query_params = st.query_params()
 if "code" in query_params and st.session_state.user is None:
     code = query_params["code"][0]
     oauth = OAuth2Session(
@@ -32,8 +32,8 @@ if "code" in query_params and st.session_state.user is None:
     response = oauth.get(USERINFO_ENDPOINT)
     user_info = response.json()
     st.session_state.user = user_info
-    # Clear the query parameters so that the code isn't re-processed on refresh.
-    st.experimental_set_query_params()
+    # Clear query parameters so code isn't re-processed on refresh.
+    st.set_query_params()
 
 # --- Top-Right Permanent Login/Logout Panel ---
 st.markdown("""
@@ -82,6 +82,5 @@ st.markdown("Przejdź do zakładki **Upload** aby dodać pliki PDF, lub do **Cha
 if st.button("📤 Przejdź do uploadu"):
     st.switch_page("pages/1_Upload.py")
 
-# Optionally, display a welcome message on the main page.
 if st.session_state.user:
     st.write(f"Witaj, {st.session_state.user.get('name', 'User')}!")
