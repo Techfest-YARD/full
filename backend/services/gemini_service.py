@@ -3,11 +3,11 @@ import os
 import google.generativeai as genai
 from concurrent.futures import ThreadPoolExecutor
 import asyncio
-import logging
+# import logging
 import time
 
 load_dotenv()
-logger = logging.getLogger(__name__)
+# logger = logging.getLogger(__name__)
 
 class GeminiService:
     def __init__(self, model_name: str = "gemini-1.5-flash"):
@@ -23,7 +23,7 @@ class GeminiService:
         loop = asyncio.get_event_loop()
         start = time.time()
 
-        logger.info(f"🔍 Sending prompt to Gemini: {prompt}")
+        # logger.info(f"🔍 Sending prompt to Gemini: {prompt}")
 
         try:
             result = await asyncio.wait_for(
@@ -31,13 +31,13 @@ class GeminiService:
                 timeout=timeout
             )
             duration = time.time() - start
-            logger.info(f"✅ Gemini responded in {duration:.2f}s")
+            # logger.info(f"✅ Gemini responded in {duration:.2f}s")
             return result.text
 
         except asyncio.TimeoutError:
-            logger.error("❌ Gemini request timed out")
+            # logger.error("❌ Gemini request timed out")
             return "Error: Request timed out"
 
         except Exception as e:
-            logger.exception("❌ Gemini error occurred")
+            # logger.exception("❌ Gemini error occurred")
             return f"Error: {e}"
