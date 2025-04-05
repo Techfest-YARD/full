@@ -1,9 +1,10 @@
 from fastapi import APIRouter, Query
-
 from services.gemini_service import GeminiService
 from services.RagPipelineService import RagPipelineService
+import logging
 
 router = APIRouter(prefix="/chat", tags=["chat"])
+logger = logging.getLogger(__name__)
 
 gemini = GeminiService()
 pipeline = RagPipelineService()
