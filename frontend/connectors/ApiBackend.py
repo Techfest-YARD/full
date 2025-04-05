@@ -18,6 +18,6 @@ class ApiBackend:
             ("files", (file.name, file.read(), "application/pdf"))
             for file in files
         ]
-        response = requests.post(f"{self._base_url}/process", files=prepared_files)
+        response = requests.post(f"{self._base_url}/upload", files=prepared_files)
         response.raise_for_status()
         return response.json()
