@@ -10,4 +10,4 @@ COPY . .
 
 EXPOSE 8080
 
-CMD python -m http.server 8080
+CMD ["fastapi", "run", "app.py", "--port", "8080", "--workers", "1"]
