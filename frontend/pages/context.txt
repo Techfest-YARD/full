@@ -1,0 +1,34 @@
+Getting Started with Git
+-------------------------
+This chapter covers the basics of Git. You will learn about version control, installing Git, and getting started with managing your source code.
+
+About Version Control
+---------------------
+Version control is a system that records changes to files over time, allowing you to recall specific versions later. It is essential for collaboration, tracking changes, and recovering previous states.
+
+Local and Centralized VCS
+-------------------------
+Local version control involves making manual backups of files, which can be error prone. Centralized systems (like CVS or Subversion) use a single server to manage changes, but this creates a single point of failure.
+
+Distributed Version Control Systems
+-------------------------------------
+Distributed systems, such as Git, allow each user to have a full copy of the repository. This approach increases reliability and makes collaboration more flexible.
+
+A Short History of Git
+----------------------
+Git was created by Linus Torvalds in 2005 for the Linux kernel project. It is renowned for its speed, efficiency with large projects, and robust branching capabilities.
+
+Git Fundamentals
+----------------
+- **Snapshots, Not Differences:** Git stores complete snapshots of your files rather than just the changes.
+- **Local Operations:** Most Git operations work entirely on your local machine, ensuring speed and offline capability.
+- **Data Integrity:** Git uses SHA-1 hashing to maintain data integrity.
+- **Three States:** Files in Git can be Modified, Staged, or Committed.
+
+Basic Git Workflow
+------------------
+1. Modify files in your working directory.
+2. Stage the changes you want to include in your next commit.
+3. Commit the staged changes to save a snapshot of your project.
+
+This overview serves as a quick and simple context for testing the app.
