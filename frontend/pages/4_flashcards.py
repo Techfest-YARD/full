@@ -10,23 +10,37 @@ FLASHCARD_DIR = "/home/flashacrd"  # Target directory for JSON files
 
 # Inline Git-related context data.
 context_data = """
-Git is a distributed version control system that helps manage source code history.
-Git allows you to track changes, collaborate with others, and experiment without fear.
-Basic Git Commands:
-- git init: Initializes a new Git repository.
-- git add: Stages changes to be committed.
-- git commit: Records the staged changes to the repository.
-- git push: Sends your commits to a remote repository.
-- git pull: Retrieves and merges changes from a remote repository.
-Git Branching:
-- git branch: Lists, creates, or deletes branches.
-- git checkout: Switches branches or restores working tree files.
-- git merge: Integrates changes from different branches.
-Git Log and History:
-- git log: Displays commit history.
-- git diff: Shows differences between commits or the working directory and commits.
-Understanding these concepts is essential for efficient source code management.
+Git is a distributed version control system.
+It helps you track changes and collaborate on code.
+git init initializes a new repository.
+git add stages changes.
+git commit records snapshots.
+git push sends your changes to a remote repository.
+git pull retrieves updates from a remote repository.
+git branch lists branches.
+git checkout switches branches.
+git merge integrates changes from different branches.
 """
+
+# --- Custom CSS for Flashcards ---
+st.markdown("""
+    <style>
+    .flashcard {
+        background-color: #0a3d62; 
+        color: white;
+        font-family: Arial, sans-serif;
+        width: 600px;
+        height: 300px;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        text-align: center;
+        margin: 20px auto;
+        border-radius: 10px;
+        padding: 20px;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
 # --- Utility Functions ---
 
@@ -38,34 +52,34 @@ def read_context(dummy_path: str) -> str:
 
 def generate_flashcards(context: str) -> list:
     """
-    Uses the provided context to generate up to 20 Git-related flashcards.
+    Uses the provided context to generate up to 20 flashcards.
     Each flashcard is a dict with keys: 'card_id', 'side1', 'side2'.
-    For demonstration, the context is split into sentences.
+    For this demo, we assume each sentence is a concept.
     """
-    sentences = context.split(".")
+    sentences = context.split("\n")
     flashcards = []
-    for idx, sentence in enumerate(sentences):
+    card_id = 1
+    for sentence in sentences:
         sentence = sentence.strip()
         if sentence and len(flashcards) < 20:
-            # Create a flashcard with a Git question and its explanation.
+            # For demonstration, use the sentence as both term and definition.
             flashcards.append({
-                "card_id": str(idx + 1),
-                "side1": f"Q: What does this mean? '{sentence}'",
-                "side2": f"A: Explanation: '{sentence}'."
+                "card_id": str(card_id),
+                "side1": f"Term: {sentence}",
+                "side2": f"Definition: {sentence}"
             })
-    # If no valid sentence found, add a default flashcard.
+            card_id += 1
     if not flashcards:
         flashcards.append({
             "card_id": "1",
-            "side1": "Q: What is Git?",
-            "side2": "A: Git is a distributed version control system for tracking changes in source code."
+            "side1": "Term: What is a flashcard?",
+            "side2": "Definition: A flashcard is a tool for learning."
         })
     return flashcards
 
 def compute_hash(data: list) -> str:
     """
     Computes an MD5 hash for the given data.
-    Keys are sorted for consistency.
     """
     json_str = json.dumps(data, sort_keys=True)
     return hashlib.md5(json_str.encode('utf-8')).hexdigest()
@@ -115,22 +129,23 @@ def display_flashcards_ui(flashcards: list):
 
     if st.session_state.current_card < len(st.session_state.cards):
         card = st.session_state.cards[st.session_state.current_card]
-        card_text = card["side2"] if st.session_state.show_back else card["side1"]
-        st.markdown("## " + card_text)
+        # Use a div with the flashcard class for styling.
+        card_content = card["side2"] if st.session_state.show_back else card["side1"]
+        st.markdown(f"<div class='flashcard'>{card_content}</div>", unsafe_allow_html=True)
 
-        # Three columns for buttons.
+        # Three columns for buttons, each with unique keys.
         col1, col2, col3 = st.columns(3)
-        if col1.button("❌ Reject (Left Arrow)"):
+        if col1.button("❌ Reject (Left Arrow)", key=f"reject_{card['card_id']}"):
             st.session_state.current_card += 1
             st.session_state.show_back = False
-        if col2.button("🔄 Flip (Space)"):
+        if col2.button("🔄 Flip (Space)", key=f"flip_{card['card_id']}"):
             st.session_state.show_back = not st.session_state.show_back
-        if col3.button("✅ Accept (Right Arrow)"):
+        if col3.button("✅ Accept (Right Arrow)", key=f"accept_{card['card_id']}"):
             st.session_state.score += 1
             st.session_state.current_card += 1
             st.session_state.show_back = False
 
-        # Handle keyboard events using a JS component.
+        # Handle keyboard events using streamlit_javascript (if installed).
         try:
             from streamlit_javascript import st_javascript
             key = st_javascript("document.addEventListener('keydown', e => e.key);")
