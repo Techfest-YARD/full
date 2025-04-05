@@ -67,3 +67,11 @@ else:
 # For demonstration purposes, display the user info dictionary
 if st.session_state.user:
     st.json(st.session_state.user)
+
+# --- Sidebar: Display Logged In User Info ---
+if st.session_state.user:
+    st.sidebar.markdown("### Logged in as:")
+    st.sidebar.markdown(f"**Name:** {st.session_state.user.get('name', 'Unknown')}")
+    st.sidebar.markdown(f"**Email:** {st.session_state.user.get('email', 'Unknown')}")
+else:
+    st.sidebar.markdown("### Not logged in")
