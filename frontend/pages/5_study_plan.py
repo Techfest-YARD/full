@@ -6,7 +6,42 @@ import datetime
 import streamlit as st
 
 # --- Configuration Constants ---
-CONTEXT_FILE = "context.txt"        # File with the learning material
+# Inline learning material (used instead of reading from "context.txt")
+context_data = """
+Getting Started with Git
+-------------------------
+This chapter covers the basics of Git. You will learn about version control, installing Git, and getting started with managing your source code.
+
+About Version Control
+---------------------
+Version control records changes to files over time, allowing you to recall specific versions later. It is essential for collaboration and recovering previous states.
+
+Local and Centralized VCS
+-------------------------
+Local VCS methods (like copying files) can be error prone, while centralized systems (like CVS or Subversion) manage changes on a single server, which can be a single point of failure.
+
+Distributed Version Control Systems
+-------------------------------------
+Distributed systems such as Git give each user a full copy of the repository, increasing reliability and flexibility.
+
+A Short History of Git
+----------------------
+Git was created by Linus Torvalds in 2005 for the Linux kernel project. It is fast, efficient, and offers robust branching capabilities.
+
+Git Fundamentals
+----------------
+- Snapshots, Not Differences: Git stores snapshots of your files.
+- Local Operations: Most operations occur locally, ensuring speed.
+- Data Integrity: Git uses SHA-1 hashing to verify data.
+- Three States: Files can be Modified, Staged, or Committed.
+
+Basic Git Workflow
+------------------
+1. Modify files in your working directory.
+2. Stage the changes you want to include.
+3. Commit the staged changes to record a snapshot.
+"""
+
 STUDY_PLAN_DIR = "/home/study_plans"  # Directory for study plan files
 
 # Ensure the study plan directory exists.
@@ -14,12 +49,11 @@ os.makedirs(STUDY_PLAN_DIR, exist_ok=True)
 
 # --- Utility Functions ---
 
-def read_context(file_path: str) -> str:
+def read_context(dummy_path: str) -> str:
     """
-    Read and return the learning material from the context file.
+    Returns the inline learning material.
     """
-    with open(file_path, "r", encoding="utf-8") as f:
-        return f.read().strip()
+    return context_data.strip()
 
 def compute_hash(data: list) -> str:
     """
@@ -53,12 +87,12 @@ def generate_study_plan(context: str, total_days: int, daily_time: int) -> list:
     Args:
         context: The full text material.
         total_days: Total days available.
-        daily_time: Daily study time in minutes (can be used to adjust detail).
+        daily_time: Daily study time in minutes.
     
     Returns:
         A list of strings with the plan for each day.
     """
-    # For demonstration, we simply split the context into sentences.
+    # For demonstration, we split the context into sentences.
     sentences = context.split('.')
     sentences = [s.strip() for s in sentences if s.strip()]
     
@@ -128,23 +162,21 @@ def display_study_plan_ui(plan: list):
 def display_notification_calendar(calendar: list):
     """
     Display the notification calendar as a bullet list.
-    In a real app, you might integrate a scheduler library (e.g., APScheduler)
-    to send notifications at 12:00 each day.
+    In a real app, you might integrate a scheduler library to send notifications.
     """
     st.markdown("## Notification Calendar")
     for entry in calendar:
         st.markdown(f"- **{entry['date']} at {entry['time']}**: {entry['message']}")
-
 
 # --- Main Pipeline ---
 
 def run_study_plan_pipeline():
     """
     Main pipeline:
-      1. Read user input (total days and daily time).
-      2. Read the learning context from file.
+      1. Get user input (total days and daily study time).
+      2. Retrieve the learning material from the inline string.
       3. Generate the study plan via a Gemini API stub.
-      4. Save the study plan (with hash-based filename).
+      4. Save the study plan (with a hash-based filename).
       5. Display the plan with checkboxes and a progress bar.
       6. Generate and display a notification calendar.
     """
@@ -156,25 +188,22 @@ def run_study_plan_pipeline():
                                  min_value=1, max_value=1440, value=60, step=5)
     
     if st.button("Generate Study Plan"):
-        try:
-            context = read_context(CONTEXT_FILE)
-        except Exception as e:
-            st.error(f"Error reading context file: {e}")
-            return
+        # Retrieve the inline context.
+        context = read_context("dummy_path_not_used")
         
-        # Generate study plan (Gemini API simulation)
+        # Generate study plan.
         study_plan = generate_study_plan(context, total_days, daily_time)
-        # Save plan to a custom file
+        # Save plan to a file.
         saved_file = save_study_plan(study_plan)
         st.info(f"Study plan generated and saved to: {saved_file}")
         
-        # Store the plan in session_state for persistence
+        # Store the plan in session_state for persistence.
         st.session_state["study_plan"] = study_plan
         
-        # Display the study plan UI
+        # Display the study plan UI.
         display_study_plan_ui(study_plan)
         
-        # Generate notification calendar (Gemini API simulation)
+        # Generate notification calendar.
         notification_calendar = generate_notification_calendar(study_plan)
         display_notification_calendar(notification_calendar)
 
@@ -185,18 +214,17 @@ st.title("Dynamic Study Plan Application - Metoda tancerki")
 st.markdown(
     """
     This gamified app helps you plan your study sessions by breaking your learning material 
-    (from `context.txt`) into daily portions with rehearsals and mock tests.
+    (stored inline) into daily portions with rehearsals and mock tests.
     """
 )
 
-# If a plan is already generated, display it; otherwise, prompt for a new one.
+# If a study plan is already generated, display it; otherwise, prompt for a new one.
 if "study_plan" in st.session_state:
     st.markdown("## Your Current Study Plan")
     display_study_plan_ui(st.session_state["study_plan"])
 else:
     run_study_plan_pipeline()
 
-# --- Note on Notifications ---
 st.markdown(
     """
     **Note:** Actual daily notifications at 12:00 would require integration with an external scheduler 
