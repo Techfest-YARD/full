@@ -8,7 +8,7 @@ GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
 
 
 # Make sure to update this redirect URI to match your configuration (it must be registered in Google Console)
-REDIRECT_URI = "http://localhost:8080/callback"  
+REDIRECT_URI = "http://localhost:8080/oauth2callback"  
 
 # OAuth endpoints for Google
 AUTHORIZATION_ENDPOINT = "https://accounts.google.com/o/oauth2/v2/auth"
