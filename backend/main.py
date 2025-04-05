@@ -1,7 +1,7 @@
 from fastapi import FastAPI
 
-from routers import chat, upload
+from routers import chat
 
 app = FastAPI()
 
-app.include_router([chat.router, upload.router])
+app.include_router(chat.router)
