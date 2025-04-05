@@ -1,5 +1,5 @@
 from fastapi import FastAPI
-from routers import chat
+from routers import chat, upload
 
 import google.cloud.logging
 import logging
@@ -14,3 +14,4 @@ logger.setLevel(logging.INFO)
 
 app = FastAPI()
 app.include_router(chat.router)
+app.include_router(upload.router)
