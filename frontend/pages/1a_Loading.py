@@ -1,6 +1,6 @@
 import streamlit as st
 
-# Initialize session state for uploaded files if not already present
+# Initialize the session state for uploaded files if not already present
 if 'uploaded_files' not in st.session_state:
     st.session_state.uploaded_files = []
 
@@ -31,7 +31,6 @@ if st.session_state.uploaded_files:
         # Create a button with a unique key for each file to delete it from the list
         if col2.button("Delete", key=file['name']):
             st.session_state.uploaded_files.remove(file)
-            st.experimental_rerun()
+            st.rerun()
 else:
     st.info("No documents uploaded yet.")
-
