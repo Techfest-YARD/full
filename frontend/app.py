@@ -78,20 +78,3 @@ with top_right.container():
             st.set_query_params()  # Clear query parameters.
             st.success("Wylogowano!")
     st.markdown("</div>", unsafe_allow_html=True)
-
-# --- Main App Content ---
-st.title("🤖 Witaj w TechFest RAG")
-st.markdown("Przejdź do zakładki **Upload** aby dodać pliki PDF, lub do **Chat** żeby rozmawiać.")
-
-if st.button("📤 Przejdź do uploadu"):
-    st.switch_page("pages/1_Upload.py")
-
-if st.session_state.user:
-    st.write(f"Witaj, {st.session_state.user.get('name', 'User')}!")
-else:
-    st.write("Nie jesteś zalogowany.")
-
-# --- Debug Section ---
-with st.expander("Debug Info", expanded=False):
-    st.write("Query Parameters:", st.query_params)
-    st.write("Session State:", st.session_state)
