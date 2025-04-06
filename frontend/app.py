@@ -38,6 +38,8 @@ if "code" in query_params and st.session_state.user is None:
         user_info = response.json()
         st.write("Debug: User info retrieved:", user_info)
         st.session_state.user = user_info
+        # Force the page to rerun so that the new session state is applied.
+        st.experimental_rerun()
     except Exception as e:
         st.error("Error during OAuth token retrieval: " + str(e))
     # Clear query parameters so the code isn't re-processed on refresh.
@@ -74,7 +76,7 @@ with top_right.container():
             )
             authorization_url, state = oauth.create_authorization_url(AUTHORIZATION_ENDPOINT)
             st.session_state.oauth_state = state
-            # Use an HTML anchor with target="_self" to force the link to open in the same window.
+            # Force same-window redirect with target="_self"
             login_link = f'<a href="{authorization_url}" target="_self">Kliknij tutaj aby się zalogować</a>'
             st.markdown(login_link, unsafe_allow_html=True)
     else:
