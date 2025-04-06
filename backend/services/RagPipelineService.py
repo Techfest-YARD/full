@@ -86,7 +86,7 @@ gemini_service = GeminiService()
 gemini_llm = GeminiLLM(gemini_service=gemini_service)
 
 
-
+embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
 
 class RagPipelineService:
     def __init__(self, logger):
@@ -97,6 +97,7 @@ class RagPipelineService:
     def _find_context(self, query):
         embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
         vectorstore = PGVector(
+            connection_string="postgresql://postgres:test@35.246.200.139:5432/vectorstore",
             connection_string="postgresql://postgres:test@35.246.200.139:5432/vectorstore",
             embedding_function=embedding_model,
             collection_name="embeddings"
