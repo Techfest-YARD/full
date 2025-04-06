@@ -1,7 +1,3 @@
-Super, dzięki za wszystkie szczegóły! Przejrzę kod backendu (głównie katalog `pages`) i frontend (głównie `services`) z repozytoriów GitHub, żeby przygotować pełne wypełnienie Twojego szablonu dokumentacji projektu. Skupię się na tym, jak aplikacja działa, jak ją uruchomić, i jak wygląda przepływ danych oraz architektura systemu.
-
-Daj mi chwilę, wrócę z gotowym podsumowaniem.
-
 # Nazwa Projektu: Let Me Solo Her team
 
 ## Spis Treści
