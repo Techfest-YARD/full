@@ -1,9 +1,8 @@
 import streamlit as st
 import json
 import logging
-from connectors.ApiBackend import ApiBackend  # Upewnij się, że ścieżka jest poprawna
 
-# Konfiguracja strony
+# Configure the page – must be first!
 st.set_page_config(page_title="GenAI Test Quiz", page_icon="✅", layout="wide")
 
 # --- Custom CSS ---
@@ -15,6 +14,8 @@ st.markdown("""
     padding: 20px;
     border-radius: 10px;
     width: 600px;
+    text-align: center;
+    font-family: Arial, sans-serif;
 }
 .explanation-box {
     background-color: #e6f7ff;
@@ -23,6 +24,7 @@ st.markdown("""
     border-radius: 5px;
     border: 1px solid #b3e0ff;
     width: 600px;
+    font-family: Arial, sans-serif;
 }
 </style>
 """, unsafe_allow_html=True)
@@ -30,10 +32,56 @@ st.markdown("""
 logger = logging.getLogger(__name__)
 logger.setLevel(logging.INFO)
 
-# Inicjalizacja serwisu backendowego
-backend = ApiBackend()
+# --- Mock Test Data (Hard-Coded) ---
+MOCK_TEST = [
+    {
+        "Question": "What is Git?",
+        "AnswerA": "A distributed version control system",
+        "AnswerB": "A programming language",
+        "AnswerC": "A text editor",
+        "AnswerD": "A web framework",
+        "CorrectAnswer": "A",
+        "Explanation": "Git is a distributed version control system used to track changes in source code."
+    },
+    {
+        "Question": "Which command is used to initialize a new Git repository?",
+        "AnswerA": "git commit",
+        "AnswerB": "git init",
+        "AnswerC": "git clone",
+        "AnswerD": "git status",
+        "CorrectAnswer": "B",
+        "Explanation": "The 'git init' command is used to create a new Git repository."
+    },
+    {
+        "Question": "How do you add files to the staging area in Git?",
+        "AnswerA": "git add",
+        "AnswerB": "git commit",
+        "AnswerC": "git push",
+        "AnswerD": "git pull",
+        "CorrectAnswer": "A",
+        "Explanation": "The 'git add' command stages changes to be committed."
+    },
+    {
+        "Question": "Which command shows the commit history?",
+        "AnswerA": "git log",
+        "AnswerB": "git status",
+        "AnswerC": "git branch",
+        "AnswerD": "git diff",
+        "CorrectAnswer": "A",
+        "Explanation": "The 'git log' command displays the commit history."
+    },
+    {
+        "Question": "Which command is used to merge branches in Git?",
+        "AnswerA": "git commit",
+        "AnswerB": "git merge",
+        "AnswerC": "git branch",
+        "AnswerD": "git init",
+        "CorrectAnswer": "B",
+        "Explanation": "The 'git merge' command is used to integrate changes from one branch into another."
+    }
+]
 
-# --- Inicjalizacja stanu sesji ---
+# --- Session State Initialization ---
 if "test_questions" not in st.session_state:
     st.session_state.test_questions = None
 if "user_answers" not in st.session_state:
@@ -41,52 +89,30 @@ if "user_answers" not in st.session_state:
 if "quiz_submitted" not in st.session_state:
     st.session_state.quiz_submitted = False
 
-def generate_test_from_backend():
-    test_questions = backend.generate_test()
-    # Jeśli otrzymany wynik jest ciągiem znaków, sprawdź czy nie jest pusty
-    if isinstance(test_questions, str):
-        if test_questions.strip() == "":
-            st.error("Otrzymano pusty ciąg testowych pytań.")
-            test_questions = []
-        else:
-            try:
-                test_questions = json.loads(test_questions)
-            except Exception as e:
-                st.error("Nie udało się sparsować pytań testowych: " + str(e))
-                test_questions = []
-    st.session_state.test_questions = test_questions
-    # Inicjalizacja odpowiedzi dla każdego pytania (jako None)
-    for i in range(len(test_questions)):
+def generate_test():
+    """Mock the generation of a test by storing the hard-coded questions."""
+    st.session_state.test_questions = MOCK_TEST
+    # Initialize each question answer as None.
+    for i in range(len(MOCK_TEST)):
         st.session_state.user_answers[str(i)] = None
 
 def display_test_generation():
     """
-    Interfejs generowania testu – użytkownik wpisuje prompt lub korzysta z domyślnego,
-    a po kliknięciu przycisku wywoływana jest funkcja generująca test.
+    Interface to generate the test. The user may enter a prompt (or use the default)
+    and click the button to generate the test.
     """
     st.header("Generate a Test")
     prompt = st.text_input("Enter a prompt for generating the test:",
                            value="Please generate a multiple-choice test on Git.")
     if st.button("Generate Test"):
-        generate_test_from_backend()
-        st.rerun()
+        generate_test()
+        st.experimental_rerun()
 
 def display_question(question_data, index: int):
     """
-    Wyświetla pojedyncze pytanie wraz z opcjami odpowiedzi.
-    Jeśli question_data jest ciągiem, próbuje go sparsować jako JSON.
+    Displays a single question in a fixed rectangular box with the question text,
+    and below that a radio button list with 4 answer options.
     """
-    # Jeśli question_data jest stringiem i nie jest pusty, spróbuj sparsować
-    if isinstance(question_data, str):
-        if question_data.strip() == "":
-            st.error("Pytanie jest puste.")
-            return
-        try:
-            question_data = json.loads(question_data)
-        except Exception as e:
-            st.error(f"Nie udało się sparsować pytania: {e}")
-            return
-
     question_id = str(index)
     st.markdown(
         f"<div class='question-box'><strong>{question_data['Question']}</strong></div>", 
@@ -108,24 +134,24 @@ def display_question(question_data, index: int):
 
 def display_quiz(questions: list):
     """
-    Jeśli quiz nie został przesłany, wyświetla wszystkie pytania.
-    Po przesłaniu wyświetla podsumowanie.
+    If the quiz hasn't been submitted, display all questions.
+    Once submitted, display a summary with results.
     """
     if not st.session_state.quiz_submitted:
         st.header("Multiple-Choice Quiz")
-        st.write("Select the correct answer for each question below:")
+        st.write("Select the correct answer for each question:")
         for i, q in enumerate(questions):
             display_question(q, i)
         if st.button("Submit Answers"):
             st.session_state.quiz_submitted = True
-            st.rerun()
+            st.experimental_rerun()
     else:
         display_summary(questions)
 
 def display_summary(questions: list):
     """
-    Wyświetla podsumowanie quizu z wynikami – dla każdego pytania pokazuje odpowiedź użytkownika,
-    poprawną odpowiedź oraz wyjaśnienie.
+    Displays the quiz summary: For each question, shows the question,
+    the user's answer, the correct answer, and the explanation.
     """
     st.header("Quiz Summary")
     correct_count = 0
@@ -151,13 +177,13 @@ def display_summary(questions: list):
         for key in ["test_questions", "user_answers", "quiz_submitted"]:
             if key in st.session_state:
                 del st.session_state[key]
-        st.rerun()
+        st.experimental_rerun()
 
 # --- MAIN PAGE ---
 st.title("GenAI Test Quiz")
 st.write("""
-This test is generated in real-time by an AI model.
-Click "Generate Test" to fetch a multiple-choice test from the backend,
+This test is generated in real-time by a GenAI tool (mocked for this demo).
+Click "Generate Test" to fetch a multiple-choice test on Git,
 then answer the questions and view your results.
 """)
 
