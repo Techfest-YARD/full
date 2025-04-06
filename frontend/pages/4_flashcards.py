@@ -5,6 +5,9 @@ import hashlib
 import streamlit as st
 import streamlit.components.v1 as components
 
+# Set page configuration once at the very beginning.
+st.set_page_config(page_title="Dynamic Flashcards", page_icon="📚", layout="wide")
+
 # --- Configuration ---
 FLASHCARD_DIR = "/home/flashacrd"  # Target directory for JSON files
 
@@ -52,9 +55,8 @@ def read_context(dummy_path: str) -> str:
 
 def generate_flashcards(context: str) -> list:
     """
-    Uses the provided context to generate up to 20 flashcards.
+    Uses the provided context to generate up to 20 Git-related flashcards.
     Each flashcard is a dict with keys: 'card_id', 'side1', 'side2'.
-    For this demo, we assume each sentence is a concept.
     """
     sentences = context.split("\n")
     flashcards = []
@@ -62,7 +64,6 @@ def generate_flashcards(context: str) -> list:
     for sentence in sentences:
         sentence = sentence.strip()
         if sentence and len(flashcards) < 20:
-            # For demonstration, use the sentence as both term and definition.
             flashcards.append({
                 "card_id": str(card_id),
                 "side1": f"Term: {sentence}",
@@ -72,8 +73,8 @@ def generate_flashcards(context: str) -> list:
     if not flashcards:
         flashcards.append({
             "card_id": "1",
-            "side1": "Term: What is a flashcard?",
-            "side2": "Definition: A flashcard is a tool for learning."
+            "side1": "Term: What is Git?",
+            "side2": "Definition: Git is a distributed version control system for tracking changes in source code."
         })
     return flashcards
 
@@ -129,7 +130,6 @@ def display_flashcards_ui(flashcards: list):
 
     if st.session_state.current_card < len(st.session_state.cards):
         card = st.session_state.cards[st.session_state.current_card]
-        # Use a div with the flashcard class for styling.
         card_content = card["side2"] if st.session_state.show_back else card["side1"]
         st.markdown(f"<div class='flashcard'>{card_content}</div>", unsafe_allow_html=True)
 
@@ -145,7 +145,7 @@ def display_flashcards_ui(flashcards: list):
             st.session_state.current_card += 1
             st.session_state.show_back = False
 
-        # Handle keyboard events using streamlit_javascript (if installed).
+        # Optional: handle keyboard events using streamlit_javascript.
         try:
             from streamlit_javascript import st_javascript
             key = st_javascript("document.addEventListener('keydown', e => e.key);")
@@ -162,7 +162,6 @@ def display_flashcards_ui(flashcards: list):
         except ImportError:
             st.warning("Install streamlit-javascript (pip install streamlit-javascript) for keyboard support.")
     else:
-        # All cards reviewed: show summary dialog.
         st.markdown("## You've finished the flashcards!")
         st.markdown(f"### Your final score: **{st.session_state.score}** out of **{len(st.session_state.cards)}**")
         if st.button("Restart with same set"):
@@ -171,7 +170,6 @@ def display_flashcards_ui(flashcards: list):
             st.session_state.show_back = False
             random.shuffle(st.session_state.cards)
         if st.button("Generate New Flashcards"):
-            # Clear session state and re-run the generation pipeline.
             for key in ['cards', 'current_card', 'score', 'show_back']:
                 if key in st.session_state:
                     del st.session_state[key]
@@ -179,46 +177,33 @@ def display_flashcards_ui(flashcards: list):
 
 def run_pipeline():
     """
-    The main pipeline:
-      1. Get the context from the inline string.
-      2. Generate flashcards via a Gemini stub.
-      3. Save flashcards with computed hash.
-      4. Load flashcards and display the flashcards UI.
+    Main pipeline:
+      1. Get the inline context.
+      2. Generate flashcards.
+      3. Save flashcards with a hash-based filename.
+      4. Load flashcards and display the UI.
     """
-    # Get the inline context.
     context = read_context("dummy_path_not_used")
-    
-    # Generate flashcards using the context.
     flashcards = generate_flashcards(context)
-    
-    # Save the generated flashcards to a JSON file.
     saved_file = save_flashcards(flashcards)
     st.info(f"Flashcards generated and saved to: {saved_file}")
-
-    # For the UI, load the flashcards from the file.
     try:
         loaded_flashcards = load_flashcards(saved_file)
     except Exception as e:
         st.error(f"Error loading flashcards: {e}")
         return
-
-    # Display the flashcards UI.
     display_flashcards_ui(loaded_flashcards)
 
 # --- Main Application ---
-st.set_page_config(page_title="Dynamic Flashcards", page_icon="📚", layout="wide")
+# Note: st.set_page_config() has already been called at the top.
 st.title("Dynamic Flashcards Application")
-st.markdown("This app generates Git-related flashcards from an inline context using a Gemini stub and then displays them for review.")
+st.markdown("This app generates Git-related flashcards from an inline context and displays them for review.")
 
-# Button to start the generation pipeline.
 if st.button("Generate Flashcards"):
-    # Clear any previous session state.
     for key in ['cards', 'current_card', 'score', 'show_back']:
         if key in st.session_state:
             del st.session_state[key]
     run_pipeline()
 
-# If flashcards have been generated, display them.
 if 'cards' in st.session_state:
     display_flashcards_ui(st.session_state.cards)
-
