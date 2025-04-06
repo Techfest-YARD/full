@@ -3,6 +3,7 @@ from routers import chat, upload, test
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
+from connectors.DbConnector import router
 import uvicorn
 
 load_dotenv()
@@ -23,6 +24,7 @@ app = FastAPI()
 app.include_router(chat.router)
 app.include_router(upload.router)
 app.include_router(test.router)
+app.include_router(router)
 
 app.add_middleware(
     CORSMiddleware,
