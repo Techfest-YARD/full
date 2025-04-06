@@ -1,9 +1,9 @@
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.document_loaders import TextLoader
+from langchain_community.document_loaders import TextLoader
 from langchain.prompts import PromptTemplate
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.vectorstores import PGVector
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import PGVector
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from services.gemini_service import GeminiService
 
 loader = TextLoader("xd.txt")
