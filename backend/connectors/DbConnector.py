@@ -8,6 +8,8 @@ import pymysql
 import numpy as np
 import time
 
+from services.logger_service import LoggerService
+
 router = APIRouter(prefix="/vectorstore", tags=["upload"])
 logger_service = LoggerService()
 

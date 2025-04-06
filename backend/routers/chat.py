@@ -19,7 +19,7 @@ async def get_answer(prompt: str = Query(..., min_length=1)):
         answer = pipeline.run(prompt)
         return {"response": answer}
     except Exception as e:
-        logger.exception("Error in default RAG mode")
+        # logger.exception("Error in default RAG mode")
         return JSONResponse(status_code=500, content={"error": str(e)})
 
 @router.get("/curious_child")
@@ -28,7 +28,7 @@ async def curious_child_chat(prompt: str = Query(..., min_length=1)):
         answer = pipeline.run_curious_child(prompt)
         return {"response": answer}
     except Exception as e:
-        logger.exception("Error in curious_child RAG mode")
+        # logger.exception("Error in curious_child RAG mode")
         return JSONResponse(status_code=500, content={"error": str(e)})
     
 @router.get("/gemini/generate_topics")
@@ -37,6 +37,6 @@ async def curious_child_chat(prompt: str = Query(..., min_length=1)):
         answer = pipeline.generate_topics_from_context(prompt)
         return {"response": answer}
     except Exception as e:
-        logger.exception("Error in curious_child RAG mode")
+        # logger.exception("Error in curious_child RAG mode")
         return JSONResponse(status_code=500, content={"error": str(e)})
 

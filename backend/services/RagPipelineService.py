@@ -14,7 +14,7 @@ text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
 docs = text_splitter.split_documents(documents)
 
 
-prompt_template = PromptTemplate(
+default_prompt_template = PromptTemplate(
     input_variables=["context", "question"],
     template="""
     Odpowiedz na pytanie na podstawie poniższego kontekstu. Jeśli nie wiesz, powiedz, że nie wiesz.
@@ -43,6 +43,7 @@ QUESTION:
 
 ANSWER (in the style of a curious child):
 """
+)
 
 prompt_template_generate_questins = PromptTemplate(
     input_variables=["context"],
@@ -57,9 +58,9 @@ Return the topics as a plain list, one per line.
 )
 
 prompt_template_teacher = PromptTemplate(
-    input_variables=["conversation", "round"],
-    template=f"""
-You are a friendly and knowledgeable teacher helping a student understand the topic: {request.topic}.
+    input_variables=["topic", "conversation", "round"],
+    template="""
+You are a friendly and knowledgeable teacher helping a student understand the topic: {topic}.
 
 Here is the conversation history so far:
 {conversation}
@@ -89,15 +90,14 @@ gemini_llm = GeminiLLM(gemini_service=gemini_service)
 
 class RagPipelineService:
     def __init__(self, logger):
-        self.retriever = retriever
         self.llm = gemini_llm
-        self.prompt_template = prompt_template
-        logger = logger
+        self.prompt_template = default_prompt_template
+        self.logger = logger
 
-    def _find_context(self):
+    def _find_context(self, query):
         embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
         vectorstore = PGVector(
-            connection_string="postgresql://postgres:test@35.246.200.139/vectorstore",
+            connection_string="postgresql://postgres:test@35.246.200.139:5432/vectorstore",
             embedding_function=embedding_model,
             collection_name="embeddings"
         )
@@ -113,7 +113,7 @@ class RagPipelineService:
         try:
             start = time.time()
 
-            context = self._find_context()
+            context = self._find_context(query)
 
             # Formatowanie prompta
             prompt = prompt_template.format(context=context, question=query)
@@ -146,7 +146,7 @@ class RagPipelineService:
             raise
 
     def run(self, query: str):
-        return self._run_internal(query, self.default_prompt_template, style="default")
+        return self._run_internal(query, default_prompt_template, style="default")
 
     def run_curious_child(self, query: str):
         return self._run_internal(query, prompt_template_curious_child, style="curiosity_mode")
@@ -155,10 +155,10 @@ class RagPipelineService:
         try:
             start = time.time()
 
-            context = self._find_context()
+            context = self._find_context(query)
 
             # Użyj prompta do generowania tematów
-            prompt = prompt_template_generate_questions.format(context=context)
+            prompt = prompt_template_generate_questins.format(context=context)
             response = self.llm(prompt)
 
             end = time.time()
