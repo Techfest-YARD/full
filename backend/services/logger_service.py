@@ -19,7 +19,7 @@ DB_PARAMS = {
 
 class LoggerService:
     def __init__(self):
-        self.value = os.getenv("DEV", default=None)
+        self.value = os.getenv("DEV", default=True)
         print(self.value)
         if self.value == None:
             self.conn = psycopg2.connect(**DB_PARAMS)
