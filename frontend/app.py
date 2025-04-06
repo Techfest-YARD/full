@@ -20,24 +20,32 @@ if "user" not in st.session_state:
 if "oauth_state" not in st.session_state:
     st.session_state.oauth_state = None
 
-# --- Automatic Code Retrieval / Mocking ---
+# --- Automatic Code Retrieval / Mocking for Google OAuth ---
 query_params = st.query_params  # st.query_params is a property
 if "code" in query_params and st.session_state.user is None:
     code = query_params["code"][0]
     st.write("Debug: Found code in query params (mock mode):", code)
-    # Instead of performing actual OAuth token exchange,
-    # we simply mock a successful login.
-    dummy_user = {
-        "name": "Test User",
-        "email": "testuser@example.com",
-        "picture": "https://via.placeholder.com/150"
-    }
-    st.session_state.user = dummy_user
-    # Optionally update the URL to indicate login status.
-    st.set_query_params(logged_in="true")
-    st.experimental_rerun()  # Force a rerun so that the UI updates.
+    try:
+        oauth = OAuth2Session(
+            client_id=GOOGLE_CLIENT_ID,
+            client_secret=GOOGLE_CLIENT_SECRET,
+            redirect_uri=REDIRECT_URI,
+            scope=["openid", "email", "profile"]
+        )
+        token = oauth.fetch_token(TOKEN_ENDPOINT, code=code)
+        st.write("Debug: Token fetched:", token)
+        response = oauth.get(USERINFO_ENDPOINT)
+        user_info = response.json()
+        st.write("Debug: User info retrieved:", user_info)
+        st.session_state.user = user_info
+        # Optionally update the URL to indicate login status.
+        st.set_query_params(logged_in="true")
+        st.experimental_rerun()  # Force a rerun so that the UI updates.
+    except Exception as e:
+        st.error("Error during OAuth token retrieval: " + str(e))
+        st.set_query_params()
 
-# --- Top-Right Permanent Login/Logout Panel ---
+# --- Top-Right Permanent Google OAuth Login/Logout Panel ---
 st.markdown("""
     <style>
     .top-right {
@@ -78,3 +86,64 @@ with top_right.container():
             st.set_query_params()  # Clear query parameters.
             st.success("Wylogowano!")
     st.markdown("</div>", unsafe_allow_html=True)
+
+# --- Additional Hardcoded Credentials Login Panel ---
+st.markdown("""
+    <style>
+    .credentials-login {
+        background-color: #fff;
+        border: 2px solid #ddd;
+        border-radius: 10px;
+        padding: 20px;
+        width: 400px;
+        margin: 20px auto;
+        font-family: Arial, sans-serif;
+        text-align: center;
+        color: #333;
+    }
+    </style>
+    """, unsafe_allow_html=True)
+
+with st.container():
+    st.markdown("<div class='credentials-login'><h3>Logowanie (Kredencje)</h3>", unsafe_allow_html=True)
+    username = st.text_input("Login", key="cred_username")
+    password = st.text_input("Hasło", type="password", key="cred_password")
+    if st.button("Zaloguj (Kredencje)", key="cred_login"):
+        if username == "Suser" and password == "Su":
+            st.session_state.user = {
+                "name": "Suser",
+                "role": "Super User",
+                "email": "suser@example.com",
+                "picture": "https://via.placeholder.com/150"
+            }
+            st.success("Zalogowano jako Super User")
+            st.experimental_rerun()
+        elif username == "Użytkownik" and password == "u":
+            st.session_state.user = {
+                "name": "Użytkownik",
+                "role": "Użytkownik",
+                "email": "uzytkownik@example.com",
+                "picture": "https://via.placeholder.com/150"
+            }
+            st.success("Zalogowano jako Użytkownik")
+            st.experimental_rerun()
+        else:
+            st.error("Nieprawidłowe dane logowania.")
+    st.markdown("</div>", unsafe_allow_html=True)
+
+# --- Main App Content ---
+st.title("🤖 Witaj w TechFest RAG")
+st.markdown("Przejdź do zakładki **Upload** aby dodać pliki PDF, lub do **Chat** żeby rozmawiać.")
+
+if st.button("📤 Przejdź do uploadu"):
+    st.switch_page("1_Upload")
+
+if st.session_state.user:
+    st.write(f"Witaj, {st.session_state.user.get('name', 'User')}! Role: {st.session_state.user.get('role', 'N/A')}")
+else:
+    st.write("Nie jesteś zalogowany.")
+
+# --- Debug Section (Optional) ---
+with st.expander("Debug Info", expanded=False):
+    st.write("Query Parameters:", st.query_params)
+    st.write("Session State:", st.session_state)
