@@ -21,7 +21,9 @@ if "oauth_state" not in st.session_state:
     st.session_state.oauth_state = None
 
 # --- Automatic Code Retrieval from URL ---
-query_params = st.query_params  # st.query_params is a property
+# Use st.query_params property to get URL parameters.
+query_params = st.query_params  
+# Only process if "code" is in query_params and we haven't set a login flag.
 if "code" in query_params and st.session_state.user is None:
     code = query_params["code"][0]
     st.write("Debug: Found code in query params:", code)
@@ -38,12 +40,12 @@ if "code" in query_params and st.session_state.user is None:
         user_info = response.json()
         st.write("Debug: User info retrieved:", user_info)
         st.session_state.user = user_info
-        # Force the page to rerun so that the new session state is applied.
-        st.experimental_rerun()
+        # Update URL to show that the user is logged in.
+        st.set_query_params(logged_in="true")
+        st.experimental_rerun()  # Force re-run so the UI updates.
     except Exception as e:
         st.error("Error during OAuth token retrieval: " + str(e))
-    # Clear query parameters so the code isn't re-processed on refresh.
-    st.set_query_params()
+        st.set_query_params()  # Clear query parameters in case of error.
 
 # --- Top-Right Permanent Login/Logout Panel ---
 st.markdown("""
@@ -76,13 +78,15 @@ with top_right.container():
             )
             authorization_url, state = oauth.create_authorization_url(AUTHORIZATION_ENDPOINT)
             st.session_state.oauth_state = state
-            # Force same-window redirect with target="_self"
+            # Use an anchor tag with target="_self" to open in same window.
             login_link = f'<a href="{authorization_url}" target="_self">Kliknij tutaj aby się zalogować</a>'
             st.markdown(login_link, unsafe_allow_html=True)
     else:
         st.write(f"**Zalogowany jako:** {st.session_state.user.get('name', 'User')}")
         if st.button("Wyloguj się", key="logout_button_app"):
             st.session_state.user = None
+            # Optionally, clear the URL query parameters.
+            st.set_query_params()
             st.success("Wylogowano!")
     st.markdown("</div>", unsafe_allow_html=True)
 
