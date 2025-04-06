@@ -40,7 +40,7 @@ if "code" in query_params and st.session_state.user is None:
         st.session_state.user = user_info
     except Exception as e:
         st.error("Error during OAuth token retrieval: " + str(e))
-    # Clear the query parameters so the code isn't re-processed on refresh.
+    # Clear query parameters so the code isn't re-processed on refresh.
     st.set_query_params()
 
 # --- Top-Right Permanent Login/Logout Panel ---
@@ -74,7 +74,9 @@ with top_right.container():
             )
             authorization_url, state = oauth.create_authorization_url(AUTHORIZATION_ENDPOINT)
             st.session_state.oauth_state = state
-            st.write(f"[Kliknij tutaj aby się zalogować]({authorization_url})")
+            # Use an HTML anchor with target="_self" to force the link to open in the same window.
+            login_link = f'<a href="{authorization_url}" target="_self">Kliknij tutaj aby się zalogować</a>'
+            st.markdown(login_link, unsafe_allow_html=True)
     else:
         st.write(f"**Zalogowany jako:** {st.session_state.user.get('name', 'User')}")
         if st.button("Wyloguj się", key="logout_button_app"):
