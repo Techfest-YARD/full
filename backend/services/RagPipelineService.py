@@ -188,25 +188,25 @@ class RagPipelineService:
             })
             raise
 
-    def run(self, query: str):
-        return self._run_internal(query, default_prompt_template, style="default")
+    # Zmieniamy na async def
+    async def run(self, query: str):
+        return await self._run_internal(query, default_prompt_template, style="default")
 
-    def run_curious_child(self, query: str):
-        return self._run_internal(query, prompt_template_curious_child, style="curiosity_mode")
+    # To samo tu
+    async def run_curious_child(self, query: str):
+        return await self._run_internal(query, prompt_template_curious_child, style="curiosity_mode")
 
-    def generate_topics_from_context(self, query: str):
-        """
-        Generuje listę 5 krótkich tematów/dyskusji na bazie kontekstu.
-        """
+    # I analogicznie, gdy wywołujesz w generate_topics_from_context:
+    async def generate_topics_from_context(self, query: str):
         try:
             start = time.time()
-
             context = self._find_context(query)
+            
+            # Zamiast self.llm(prompt), wywołujemy jawnie asynchronicznie
             prompt = prompt_template_generate_questins.format(context=context)
-            response = self.llm(prompt)
+            response = await self.llm.get_answear(prompt)
 
             end = time.time()
-
             self.logger.log_llm_call({
                 "query": query,
                 "prompt": prompt,
@@ -217,7 +217,6 @@ class RagPipelineService:
                 "error": None
             })
 
-            # Konwersja tekstu wyjściowego do listy 5 tematów
             topics = [line.strip("-• ").strip() for line in response.splitlines() if line.strip()]
             return topics[:5]
 

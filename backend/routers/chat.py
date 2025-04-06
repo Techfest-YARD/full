@@ -16,7 +16,7 @@ pipeline = RagPipelineService(logger=logger)
 @router.get("/")
 async def get_answer(prompt: str = Query(..., min_length=1)):
     try:
-        answer = pipeline.run(prompt)
+        answer = await pipeline.run(prompt)
         return {"response": answer}
     except Exception as e:
         # logger.exception("Error in default RAG mode")
@@ -25,7 +25,7 @@ async def get_answer(prompt: str = Query(..., min_length=1)):
 @router.get("/curious_child")
 async def curious_child_chat(prompt: str = Query(..., min_length=1)):
     try:
-        answer = pipeline.run_curious_child(prompt)
+        answer = await pipeline.run_curious_child(prompt)
         return {"response": answer}
     except Exception as e:
         # logger.exception("Error in curious_child RAG mode")
@@ -34,7 +34,7 @@ async def curious_child_chat(prompt: str = Query(..., min_length=1)):
 @router.get("/gemini/generate_topics")
 async def curious_child_chat(prompt: str = Query(..., min_length=1)):
     try:
-        answer = pipeline.generate_topics_from_context(prompt)
+        answer = await  pipeline.generate_topics_from_context(prompt)
         return {"response": answer}
     except Exception as e:
         # logger.exception("Error in curious_child RAG mode")
