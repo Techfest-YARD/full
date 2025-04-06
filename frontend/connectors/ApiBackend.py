@@ -27,6 +27,20 @@ class ApiBackend:
             logger.error(f"GET request failed: {e}")
             logger.debug(response.text if 'response' in locals() else "No response object")
             return "[Error during request]"
+        
+    def ask_chat_curious_child(self, message: str) -> str:
+        params = {"prompt": message}
+        url = f"{self._base_url}/chat/curious_child"
+        logger.info(f"Sending GET request to {url} with params: {params}")
+        try:
+            response = requests.get(url, params=params)
+            response.raise_for_status()
+            logger.info(f"Response: {response.status_code} - {response.text}")
+            return response.json().get("response", "[No response]")
+        except Exception as e:
+            logger.error(f"GET request failed: {e}")
+            logger.debug(response.text if 'response' in locals() else "No response object")
+            return "[Error during request]"
 
     def upload_files(self, files: list) -> dict:
         prepared_files = [

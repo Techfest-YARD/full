@@ -6,8 +6,14 @@ import sqlalchemy
 from google.cloud.sql.connector import Connector, IPTypes
 import pymysql
 import numpy as np
+import time
+
+from services.logger_service import LoggerService
 
 router = APIRouter(prefix="/vectorstore", tags=["upload"])
+logger_service = LoggerService()
+
+
 
 class Documents(BaseModel):
     texts: list[str]
@@ -45,20 +51,41 @@ def connect_with_connector() -> sqlalchemy.engine.base.Engine:
 
 @router.post("/upload_documents")
 async def upload_documents(documents: Documents):
-    embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+    start = time.time()
+    try:
+        # Embedding i zapis
+        embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+        embeddings = [embedding_model.encode(doc) for doc in documents.texts]
+        embeddings = [np.array(e).tolist() for e in embeddings] 
 
-    embeddings = [embedding_model.encode(doc) for doc in documents.texts]
-    embeddings = [np.array(e).tolist() for e in embeddings] 
+        engine = connect_with_connector()
+        with engine.connect() as connection:
+            insert_query = """
+                INSERT INTO embeddings (text, embedding) 
+                VALUES (%s, %s)
+            """
+            data_to_insert = [(text, embedding) for text, embedding in zip(documents.texts, embeddings)]
+            connection.execute(insert_query, data_to_insert)
 
-    engine = connect_with_connector()
-    with engine.connect() as connection:
-        insert_query = """
-            INSERT INTO embeddings (text, embedding) 
-            VALUES (%s, %s)
-        """
+        duration = int((time.time() - start) * 1000)
+        logger_service.log_app_event({
+            "event_type": "document_upload",
+            "path": "/upload_documents",
+            "message": f"{len(documents.texts)} dokumentów zapisanych",
+            "status": "success",
+            "duration_ms": duration,
+            "extra": {"text_count": len(documents.texts)}
+        })
 
-        data_to_insert = [(text, embedding) for text, embedding in zip(documents.texts, embeddings)]
+        return {"message": "Documents uploaded and embeddings saved successfully."}
+    
+    except Exception as e:
+        logger_service.log_app_event({
+            "event_type": "document_upload",
+            "path": "/upload_documents",
+            "message": "Błąd podczas zapisu dokumentów",
+            "status": "error",
+            "extra": {"error": str(e)}
+        })
+        raise
 
-        connection.execute(insert_query, data_to_insert)
-
-    return {"message": "Documents uploaded and embeddings saved successfully."}
