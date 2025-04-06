@@ -1,9 +1,9 @@
 from langchain.text_splitter import RecursiveCharacterTextSplitter
-from langchain.document_loaders import TextLoader
+from langchain_community.document_loaders import TextLoader
 from langchain.prompts import PromptTemplate
-from langchain.embeddings import HuggingFaceEmbeddings
-from langchain.vectorstores import PGVector
-from langchain.embeddings import HuggingFaceEmbeddings
+from langchain_community.embeddings import HuggingFaceEmbeddings
+from langchain_community.vectorstores import PGVector
+from langchain_community.embeddings import HuggingFaceEmbeddings
 from services.gemini_service import GeminiService
 import time
 
@@ -85,14 +85,6 @@ gemini_service = GeminiService()
 gemini_llm = GeminiLLM(gemini_service=gemini_service)
 
 
-embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
-vectorstore = PGVector(
-    connection_string="postgresql://postgres:test@35.246.200.139/vectorstore",
-    embedding_function=embedding_model,
-    table_name="embeddings",
-    vector_column="embedding"
-)
-retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 3})
 
 
 class RagPipelineService:
@@ -102,13 +94,26 @@ class RagPipelineService:
         self.prompt_template = prompt_template
         logger = logger
 
+    def _find_context(self):
+        embedding_model = HuggingFaceEmbeddings(model_name="sentence-transformers/all-MiniLM-L6-v2")
+        vectorstore = PGVector(
+            connection_string="postgresql://postgres:test@35.246.200.139/vectorstore",
+            embedding_function=embedding_model,
+            collection_name="embeddings"
+        )
+        retriever = vectorstore.as_retriever(search_type="similarity", search_kwargs={"k": 3})
+
+
+        retrieved_docs = retriever.get_relevant_documents(query)
+        context = "\n".join([doc.page_content for doc in retrieved_docs])
+
+        return context
+
     def _run_internal(self, query: str, prompt_template: PromptTemplate, style: str):
         try:
             start = time.time()
 
-            # Pobieranie kontekstu z retrievera
-            retrieved_docs = self.retriever.get_relevant_documents(query)
-            context = "\n".join([doc.page_content for doc in retrieved_docs])
+            context = self._find_context()
 
             # Formatowanie prompta
             prompt = prompt_template.format(context=context, question=query)
@@ -150,9 +155,7 @@ class RagPipelineService:
         try:
             start = time.time()
 
-            # Pobierz kontekst z retrievera
-            retrieved_docs = self.retriever.get_relevant_documents(query)
-            context = "\n".join([doc.page_content for doc in retrieved_docs])
+            context = self._find_context()
 
             # Użyj prompta do generowania tematów
             prompt = prompt_template_generate_questions.format(context=context)

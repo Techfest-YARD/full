@@ -5,6 +5,7 @@ tech_env_backend/
 .tech_env_backend/
 
 /venv
+/venvv
 
 __pycache__/
 *.py[cod]

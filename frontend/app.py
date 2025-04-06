@@ -21,20 +21,26 @@ if "oauth_state" not in st.session_state:
     st.session_state.oauth_state = None
 
 # --- Automatic Code Retrieval from URL ---
-query_params = st.query_params  # st.query_params is now a property, not callable
+query_params = st.query_params  # st.query_params is a property
 if "code" in query_params and st.session_state.user is None:
     code = query_params["code"][0]
+    st.write("Debug: Found code in query params:", code)
     oauth = OAuth2Session(
         client_id=GOOGLE_CLIENT_ID,
         client_secret=GOOGLE_CLIENT_SECRET,
         redirect_uri=REDIRECT_URI,
         scope=["openid", "email", "profile"]
     )
-    token = oauth.fetch_token(TOKEN_ENDPOINT, code=code)
-    response = oauth.get(USERINFO_ENDPOINT)
-    user_info = response.json()
-    st.session_state.user = user_info
-    # Clear query parameters so the code isn't re-processed on refresh.
+    try:
+        token = oauth.fetch_token(TOKEN_ENDPOINT, code=code)
+        st.write("Debug: Token fetched:", token)
+        response = oauth.get(USERINFO_ENDPOINT)
+        user_info = response.json()
+        st.write("Debug: User info retrieved:", user_info)
+        st.session_state.user = user_info
+    except Exception as e:
+        st.error("Error during OAuth token retrieval: " + str(e))
+    # Clear the query parameters so the code isn't re-processed on refresh.
     st.set_query_params()
 
 # --- Top-Right Permanent Login/Logout Panel ---
@@ -85,3 +91,10 @@ if st.button("📤 Przejdź do uploadu"):
 
 if st.session_state.user:
     st.write(f"Witaj, {st.session_state.user.get('name', 'User')}!")
+else:
+    st.write("Nie jesteś zalogowany.")
+
+# --- Debug Section ---
+with st.expander("Debug Info", expanded=False):
+    st.write("Query Parameters:", st.query_params)
+    st.write("Session State:", st.session_state)
