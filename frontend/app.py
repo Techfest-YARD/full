@@ -1,11 +1,12 @@
 import streamlit as st
 import os
+import requests
 from authlib.integrations.requests_client import OAuth2Session
 
 # Must be the very first Streamlit command!
 st.set_page_config(page_title="TechFest RAG", page_icon="🤖", layout="wide")
 
-# --- OAuth Configuration (from environment variables) ---
+# --- OAuth Configuration (using environment variables) ---
 GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET")
 REDIRECT_URI = "https://frontend-46193761155.europe-west3.run.app/oauth2callback"  
@@ -19,31 +20,22 @@ if "user" not in st.session_state:
 if "oauth_state" not in st.session_state:
     st.session_state.oauth_state = None
 
-# --- Automatic Code Retrieval from URL ---
-# st.query_params is a property, not a callable.
-query_params = st.query_params  
+# --- Automatic Code Retrieval / Mocking ---
+query_params = st.query_params  # st.query_params is a property
 if "code" in query_params and st.session_state.user is None:
     code = query_params["code"][0]
-    st.write("Debug: Found code in query params:", code)
-    try:
-        oauth = OAuth2Session(
-            client_id=GOOGLE_CLIENT_ID,
-            client_secret=GOOGLE_CLIENT_SECRET,
-            redirect_uri=REDIRECT_URI,
-            scope=["openid", "email", "profile"]
-        )
-        token = oauth.fetch_token(TOKEN_ENDPOINT, code=code)
-        st.write("Debug: Token fetched:", token)
-        response = oauth.get(USERINFO_ENDPOINT)
-        user_info = response.json()
-        st.write("Debug: User info retrieved:", user_info)
-        st.session_state.user = user_info
-        # Update URL to show that the user is logged in.
-        st.set_query_params(logged_in="true")
-        st.experimental_rerun()  # Force a rerun to update the UI.
-    except Exception as e:
-        st.error("Error during OAuth token retrieval: " + str(e))
-        st.set_query_params()
+    st.write("Debug: Found code in query params (mock mode):", code)
+    # Instead of performing actual OAuth token exchange,
+    # we simply mock a successful login.
+    dummy_user = {
+        "name": "Test User",
+        "email": "testuser@example.com",
+        "picture": "https://via.placeholder.com/150"
+    }
+    st.session_state.user = dummy_user
+    # Optionally update the URL to indicate login status.
+    st.set_query_params(logged_in="true")
+    st.experimental_rerun()  # Force a rerun so that the UI updates.
 
 # --- Top-Right Permanent Login/Logout Panel ---
 st.markdown("""
@@ -76,7 +68,7 @@ with top_right.container():
             )
             authorization_url, state = oauth.create_authorization_url(AUTHORIZATION_ENDPOINT)
             st.session_state.oauth_state = state
-            # Force same-window redirect using target="_self"
+            # Use an anchor tag with target="_self" to force same-window navigation.
             login_link = f'<a href="{authorization_url}" target="_self">Kliknij tutaj aby się zalogować</a>'
             st.markdown(login_link, unsafe_allow_html=True)
     else:
@@ -99,7 +91,7 @@ if st.session_state.user:
 else:
     st.write("Nie jesteś zalogowany.")
 
-# --- Debug Section (Optional) ---
+# --- Debug Section ---
 with st.expander("Debug Info", expanded=False):
     st.write("Query Parameters:", st.query_params)
     st.write("Session State:", st.session_state)
