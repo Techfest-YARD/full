@@ -3,6 +3,7 @@ from routers import chat, upload, test
 from fastapi.middleware.cors import CORSMiddleware
 import os
 from dotenv import load_dotenv
+import uvicorn
 
 load_dotenv()
 
@@ -30,4 +31,7 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+if __name__ == "__main__":
+    uvicorn.run("app:app", host="127.0.0.1", port=8080, reload=True)
 
