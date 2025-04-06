@@ -1,6 +1,11 @@
 import streamlit as st
 import datetime
 
+from connectors.ApiBackend import ApiBackend
+
+backend = ApiBackend()
+
+
 # --- Inline Learning Material ---
 context_data = """
 Getting Started with Git
@@ -53,15 +58,11 @@ def initialize_conversation(topic: str) -> str:
 
 def get_agent_question(topic: str, conversation_memory: str, round_count: int) -> str:
     """
-    Simulates a Gemini API call that generates a follow-up question based on the topic,
-    conversation history, and current round of dialogue.
+    Używa backendowego LLM-a przez FastAPI do generowania odpowiedzi w stylu Curious Child.
     """
-    if round_count == 1:
-        return "Agent: Why do you think this is important? Please elaborate.\n"
-    elif round_count == 2:
-        return "Agent: Can you provide an example or further explain your thought?\n"
-    else:
-        return "Agent: Thank you for your response. Moving to the next topic.\n"
+    last_user_message = [line for line in conversation_memory.strip().splitlines() if line.startswith("User:")]
+    user_prompt = last_user_message[-1].replace("User:", "").strip() if last_user_message else topic
+    return f"Agent: {backend.ask_chat_curious_child(user_prompt)}"
 
 def generate_summary(conversation_history: dict) -> str:
     """
