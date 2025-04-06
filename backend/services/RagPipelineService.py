@@ -45,7 +45,7 @@ ANSWER (in the style of a curious child):
 """
 
 prompt_template_generate_questins = PromptTemplate(
-    input_variables=["context"]
+    input_variables=["context"],
     template="""
 You are an AI tutor. Based on the following educational content, generate 5 short discussion topics.
 
@@ -53,6 +53,19 @@ CONTENT:
 {context}
 
 Return the topics as a plain list, one per line.
+"""
+)
+
+prompt_template_teacher = PromptTemplate(
+    input_variables=["conversation", "round"],
+    template=f"""
+You are a friendly and knowledgeable teacher helping a student understand the topic: {request.topic}.
+
+Here is the conversation history so far:
+{conversation}
+
+We are in round {round}.
+Please continue the conversation by asking a follow-up question or giving feedback to encourage the student to elaborate or give examples.
 """
 )
 
