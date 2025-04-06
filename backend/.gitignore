@@ -4,6 +4,9 @@
 tech_env_backend/
 .tech_env_backend/
 
+../venv
+/venv/**
+/venv/*
 /venv
 /venvv
 
