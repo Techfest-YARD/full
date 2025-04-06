@@ -1,0 +1,816 @@
+{
+  "runs": [
+    {
+      "tool": {
+        "driver": {
+          "name": "Bandit",
+          "organization": "PyCQA",
+          "rules": [
+            {
+              "id": "B105",
+              "name": "hardcoded_password_string",
+              "properties": {
+                "tags": [
+                  "security",
+                  "external/cwe/cwe-259"
+                ],
+                "precision": "medium"
+              },
+              "helpUri": "https://bandit.readthedocs.io/en/1.8.3/plugins/b105_hardcoded_password_string.html"
+            },
+            {
+              "id": "B608",
+              "name": "hardcoded_sql_expressions",
+              "properties": {
+                "tags": [
+                  "security",
+                  "external/cwe/cwe-89"
+                ],
+                "precision": "low"
+              },
+              "helpUri": "https://bandit.readthedocs.io/en/1.8.3/plugins/b608_hardcoded_sql_expressions.html"
+            },
+            {
+              "id": "B113",
+              "name": "request_without_timeout",
+              "properties": {
+                "tags": [
+                  "security",
+                  "external/cwe/cwe-400"
+                ],
+                "precision": "low"
+              },
+              "helpUri": "https://bandit.readthedocs.io/en/1.8.3/plugins/b113_request_without_timeout.html"
+            },
+            {
+              "id": "B324",
+              "name": "hashlib",
+              "properties": {
+                "tags": [
+                  "security",
+                  "external/cwe/cwe-327"
+                ],
+                "precision": "high"
+              },
+              "helpUri": "https://bandit.readthedocs.io/en/1.8.3/plugins/b324_hashlib.html"
+            }
+          ],
+          "version": "1.8.3",
+          "semanticVersion": "1.8.3"
+        }
+      },
+      "invocations": [
+        {
+          "executionSuccessful": true,
+          "endTimeUtc": "2025-04-06T07:53:43Z"
+        }
+      ],
+      "properties": {
+        "metrics": {
+          "_totals": {
+            "loc": 1853,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "SEVERITY.LOW": 2,
+            "CONFIDENCE.LOW": 7,
+            "SEVERITY.MEDIUM": 7,
+            "CONFIDENCE.MEDIUM": 2,
+            "SEVERITY.HIGH": 2,
+            "CONFIDENCE.HIGH": 2
+          },
+          "./backend/app.py": {
+            "loc": 23,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.HIGH": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.HIGH": 0
+          },
+          "./backend/connectors/ConnectorELK.py": {
+            "loc": 12,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.HIGH": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.HIGH": 0
+          },
+          "./backend/connectors/DbConnector.py": {
+            "loc": 49,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.HIGH": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.HIGH": 0
+          },
+          "./backend/routers/chat.py": {
+            "loc": 39,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.HIGH": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.HIGH": 0
+          },
+          "./backend/routers/test.py": {
+            "loc": 17,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.HIGH": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.HIGH": 0
+          },
+          "./backend/routers/upload.py": {
+            "loc": 12,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.HIGH": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.HIGH": 0
+          },
+          "./backend/routers/upload_vector.py": {
+            "loc": 46,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 1,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.HIGH": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 1,
+            "CONFIDENCE.HIGH": 0
+          },
+          "./backend/services/RagPipelineService.py": {
+            "loc": 243,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 1,
+            "SEVERITY.HIGH": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 1,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.HIGH": 0
+          },
+          "./backend/services/UploadPdfService.py": {
+            "loc": 50,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.HIGH": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.HIGH": 0
+          },
+          "./backend/services/VectorStoreRetrainer.py": {
+            "loc": 76,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.HIGH": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.HIGH": 0
+          },
+          "./backend/services/gemini_service.py": {
+            "loc": 35,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.HIGH": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.HIGH": 0
+          },
+          "./backend/services/logger_service.py": {
+            "loc": 60,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.HIGH": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.HIGH": 0
+          },
+          "./frontend/app.py": {
+            "loc": 65,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 1,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.HIGH": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 1,
+            "CONFIDENCE.HIGH": 0
+          },
+          "./frontend/connectors/ApiBackend.py": {
+            "loc": 87,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 5,
+            "SEVERITY.HIGH": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 5,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.HIGH": 0
+          },
+          "./frontend/fff_app.py": {
+            "loc": 5,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.HIGH": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.HIGH": 0
+          },
+          "./frontend/pages/1_Upload.py": {
+            "loc": 19,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.HIGH": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.HIGH": 0
+          },
+          "./frontend/pages/1a_Loading.py": {
+            "loc": 21,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.HIGH": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.HIGH": 0
+          },
+          "./frontend/pages/2_MethodSelect.py": {
+            "loc": 54,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.HIGH": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.HIGH": 0
+          },
+          "./frontend/pages/3_Chat.py": {
+            "loc": 24,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.HIGH": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.HIGH": 0
+          },
+          "./frontend/pages/4_flashcards.py": {
+            "loc": 177,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.HIGH": 1,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.HIGH": 1
+          },
+          "./frontend/pages/5_study_plan.py": {
+            "loc": 174,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.HIGH": 1,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.HIGH": 1
+          },
+          "./frontend/pages/6_curious_child.py": {
+            "loc": 150,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 1,
+            "SEVERITY.HIGH": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 1,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.HIGH": 0
+          },
+          "./frontend/pages/7_teacher.py": {
+            "loc": 269,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.HIGH": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.HIGH": 0
+          },
+          "./frontend/pages/8_tests.py": {
+            "loc": 146,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.HIGH": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.HIGH": 0
+          },
+          "./frontend/utils/file_utils.py": {
+            "loc": 0,
+            "nosec": 0,
+            "skipped_tests": 0,
+            "SEVERITY.UNDEFINED": 0,
+            "SEVERITY.LOW": 0,
+            "SEVERITY.MEDIUM": 0,
+            "SEVERITY.HIGH": 0,
+            "CONFIDENCE.UNDEFINED": 0,
+            "CONFIDENCE.LOW": 0,
+            "CONFIDENCE.MEDIUM": 0,
+            "CONFIDENCE.HIGH": 0
+          }
+        }
+      },
+      "results": [
+        {
+          "message": {
+            "text": "Possible hardcoded password: 'test'"
+          },
+          "level": "note",
+          "locations": [
+            {
+              "physicalLocation": {
+                "region": {
+                  "snippet": {
+                    "text": "    db_pass = \"test\"\n"
+                  },
+                  "endColumn": 21,
+                  "endLine": 18,
+                  "startColumn": 15,
+                  "startLine": 18
+                },
+                "artifactLocation": {
+                  "uri": "backend/routers/upload_vector.py"
+                },
+                "contextRegion": {
+                  "snippet": {
+                    "text": "    db_user = \"postgres\"\n    db_pass = \"test\"\n    db_name = \"vectorstore\"\n"
+                  },
+                  "endLine": 19,
+                  "startLine": 17
+                }
+              }
+            }
+          ],
+          "properties": {
+            "issue_confidence": "MEDIUM",
+            "issue_severity": "LOW"
+          },
+          "ruleId": "B105",
+          "ruleIndex": 0
+        },
+        {
+          "message": {
+            "text": "Possible SQL injection vector through string-based query construction."
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "region": {
+                  "snippet": {
+                    "text": "            sql = f\"\"\"\n"
+                  },
+                  "endColumn": 41,
+                  "endLine": 158,
+                  "startColumn": 23,
+                  "startLine": 157
+                },
+                "artifactLocation": {
+                  "uri": "backend/services/RagPipelineService.py"
+                },
+                "contextRegion": {
+                  "snippet": {
+                    "text": "            # Uwaga: U\u017cywamy f-string, bo parametryzowanie limitu i operatora <-> bywa tricky.\n            sql = f\"\"\"\n                SELECT embedding\n                FROM embeddings\n                ORDER BY embedding <-> '{embedding_str}'\n                LIMIT {k}\n            \"\"\"\n\n"
+                  },
+                  "endLine": 163,
+                  "startLine": 156
+                }
+              }
+            }
+          ],
+          "properties": {
+            "issue_confidence": "LOW",
+            "issue_severity": "MEDIUM"
+          },
+          "ruleId": "B608",
+          "ruleIndex": 1
+        },
+        {
+          "message": {
+            "text": "Possible hardcoded password: 'https://oauth2.googleapis.com/token'"
+          },
+          "level": "note",
+          "locations": [
+            {
+              "physicalLocation": {
+                "region": {
+                  "snippet": {
+                    "text": "TOKEN_ENDPOINT = \"https://oauth2.googleapis.com/token\"\n"
+                  },
+                  "endColumn": 55,
+                  "endLine": 14,
+                  "startColumn": 18,
+                  "startLine": 14
+                },
+                "artifactLocation": {
+                  "uri": "frontend/app.py"
+                },
+                "contextRegion": {
+                  "snippet": {
+                    "text": "AUTHORIZATION_ENDPOINT = \"https://accounts.google.com/o/oauth2/v2/auth\"\nTOKEN_ENDPOINT = \"https://oauth2.googleapis.com/token\"\nUSERINFO_ENDPOINT = \"https://openidconnect.googleapis.com/v1/userinfo\"\n"
+                  },
+                  "endLine": 15,
+                  "startLine": 13
+                }
+              }
+            }
+          ],
+          "properties": {
+            "issue_confidence": "MEDIUM",
+            "issue_severity": "LOW"
+          },
+          "ruleId": "B105",
+          "ruleIndex": 0
+        },
+        {
+          "message": {
+            "text": "Call to requests without timeout"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "region": {
+                  "snippet": {
+                    "text": "            response = requests.get(url, params=params)\n"
+                  },
+                  "endColumn": 56,
+                  "endLine": 22,
+                  "startColumn": 24,
+                  "startLine": 22
+                },
+                "artifactLocation": {
+                  "uri": "frontend/connectors/ApiBackend.py"
+                },
+                "contextRegion": {
+                  "snippet": {
+                    "text": "        try:\n            response = requests.get(url, params=params)\n            response.raise_for_status()\n"
+                  },
+                  "endLine": 23,
+                  "startLine": 21
+                }
+              }
+            }
+          ],
+          "properties": {
+            "issue_confidence": "LOW",
+            "issue_severity": "MEDIUM"
+          },
+          "ruleId": "B113",
+          "ruleIndex": 2
+        },
+        {
+          "message": {
+            "text": "Call to requests without timeout"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "region": {
+                  "snippet": {
+                    "text": "            response = requests.get(url, params=params)\n"
+                  },
+                  "endColumn": 56,
+                  "endLine": 36,
+                  "startColumn": 24,
+                  "startLine": 36
+                },
+                "artifactLocation": {
+                  "uri": "frontend/connectors/ApiBackend.py"
+                },
+                "contextRegion": {
+                  "snippet": {
+                    "text": "        try:\n            response = requests.get(url, params=params)\n            response.raise_for_status()\n"
+                  },
+                  "endLine": 37,
+                  "startLine": 35
+                }
+              }
+            }
+          ],
+          "properties": {
+            "issue_confidence": "LOW",
+            "issue_severity": "MEDIUM"
+          },
+          "ruleId": "B113",
+          "ruleIndex": 2
+        },
+        {
+          "message": {
+            "text": "Call to requests without timeout"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "region": {
+                  "snippet": {
+                    "text": "            response = requests.get(url, params=params)\n"
+                  },
+                  "endColumn": 56,
+                  "endLine": 50,
+                  "startColumn": 24,
+                  "startLine": 50
+                },
+                "artifactLocation": {
+                  "uri": "frontend/connectors/ApiBackend.py"
+                },
+                "contextRegion": {
+                  "snippet": {
+                    "text": "        try:\n            response = requests.get(url, params=params)\n            response.raise_for_status()\n"
+                  },
+                  "endLine": 51,
+                  "startLine": 49
+                }
+              }
+            }
+          ],
+          "properties": {
+            "issue_confidence": "LOW",
+            "issue_severity": "MEDIUM"
+          },
+          "ruleId": "B113",
+          "ruleIndex": 2
+        },
+        {
+          "message": {
+            "text": "Call to requests without timeout"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "region": {
+                  "snippet": {
+                    "text": "            response = requests.get(url, params=params)\n"
+                  },
+                  "endColumn": 56,
+                  "endLine": 71,
+                  "startColumn": 24,
+                  "startLine": 71
+                },
+                "artifactLocation": {
+                  "uri": "frontend/connectors/ApiBackend.py"
+                },
+                "contextRegion": {
+                  "snippet": {
+                    "text": "        try:\n            response = requests.get(url, params=params)\n            response.raise_for_status()\n"
+                  },
+                  "endLine": 72,
+                  "startLine": 70
+                }
+              }
+            }
+          ],
+          "properties": {
+            "issue_confidence": "LOW",
+            "issue_severity": "MEDIUM"
+          },
+          "ruleId": "B113",
+          "ruleIndex": 2
+        },
+        {
+          "message": {
+            "text": "Call to requests without timeout"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "region": {
+                  "snippet": {
+                    "text": "        response = requests.post(f\"{self._base_url}/upload\", files=prepared_files)\n"
+                  },
+                  "endColumn": 83,
+                  "endLine": 100,
+                  "startColumn": 20,
+                  "startLine": 100
+                },
+                "artifactLocation": {
+                  "uri": "frontend/connectors/ApiBackend.py"
+                },
+                "contextRegion": {
+                  "snippet": {
+                    "text": "        ]\n        response = requests.post(f\"{self._base_url}/upload\", files=prepared_files)\n        response.raise_for_status()\n"
+                  },
+                  "endLine": 101,
+                  "startLine": 99
+                }
+              }
+            }
+          ],
+          "properties": {
+            "issue_confidence": "LOW",
+            "issue_severity": "MEDIUM"
+          },
+          "ruleId": "B113",
+          "ruleIndex": 2
+        },
+        {
+          "message": {
+            "text": "Use of weak MD5 hash for security. Consider usedforsecurity=False"
+          },
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "region": {
+                  "snippet": {
+                    "text": "    return hashlib.md5(json_str.encode('utf-8')).hexdigest()\n"
+                  },
+                  "endColumn": 49,
+                  "endLine": 86,
+                  "startColumn": 12,
+                  "startLine": 86
+                },
+                "artifactLocation": {
+                  "uri": "frontend/pages/4_flashcards.py"
+                },
+                "contextRegion": {
+                  "snippet": {
+                    "text": "    json_str = json.dumps(data, sort_keys=True)\n    return hashlib.md5(json_str.encode('utf-8')).hexdigest()\n\n"
+                  },
+                  "endLine": 87,
+                  "startLine": 85
+                }
+              }
+            }
+          ],
+          "properties": {
+            "issue_confidence": "HIGH",
+            "issue_severity": "HIGH"
+          },
+          "ruleId": "B324",
+          "ruleIndex": 3
+        },
+        {
+          "message": {
+            "text": "Use of weak MD5 hash for security. Consider usedforsecurity=False"
+          },
+          "level": "error",
+          "locations": [
+            {
+              "physicalLocation": {
+                "region": {
+                  "snippet": {
+                    "text": "    return hashlib.md5(json_str.encode('utf-8')).hexdigest()\n"
+                  },
+                  "endColumn": 49,
+                  "endLine": 63,
+                  "startColumn": 12,
+                  "startLine": 63
+                },
+                "artifactLocation": {
+                  "uri": "frontend/pages/5_study_plan.py"
+                },
+                "contextRegion": {
+                  "snippet": {
+                    "text": "    json_str = json.dumps(data, sort_keys=True)\n    return hashlib.md5(json_str.encode('utf-8')).hexdigest()\n\n"
+                  },
+                  "endLine": 64,
+                  "startLine": 62
+                }
+              }
+            }
+          ],
+          "properties": {
+            "issue_confidence": "HIGH",
+            "issue_severity": "HIGH"
+          },
+          "ruleId": "B324",
+          "ruleIndex": 3
+        },
+        {
+          "message": {
+            "text": "Call to requests without timeout"
+          },
+          "locations": [
+            {
+              "physicalLocation": {
+                "region": {
+                  "snippet": {
+                    "text": "        response = requests.get(url, params=params)\n"
+                  },
+                  "endColumn": 52,
+                  "endLine": 51,
+                  "startColumn": 20,
+                  "startLine": 51
+                },
+                "artifactLocation": {
+                  "uri": "frontend/pages/6_curious_child.py"
+                },
+                "contextRegion": {
+                  "snippet": {
+                    "text": "    try:\n        response = requests.get(url, params=params)\n        response.raise_for_status()\n"
+                  },
+                  "endLine": 52,
+                  "startLine": 50
+                }
+              }
+            }
+          ],
+          "properties": {
+            "issue_confidence": "LOW",
+            "issue_severity": "MEDIUM"
+          },
+          "ruleId": "B113",
+          "ruleIndex": 2
+        }
+      ]
+    }
+  ],
+  "version": "2.1.0",
+  "$schema": "https://json.schemastore.org/sarif-2.1.0.json"
+}
