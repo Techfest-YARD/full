@@ -5,6 +5,12 @@ import psycopg2  # Driver do PostgreSQL
 from fastapi import APIRouter
 from pydantic import BaseModel
 from langchain.embeddings import HuggingFaceEmbeddings
+from dotenv import load_dotenv
+import os
+
+load_dotenv()
+VECTOR_PASSWORD = os.getenv("VECTOR_PASSWORD")
+
 
 router = APIRouter(prefix="/upload_vector", tags=["upload_vector"])
 
@@ -21,7 +27,7 @@ def connect_via_public_ip() -> sqlalchemy.engine.base.Engine:
     host = "35.246.200.139"  # publiczny IP z Cloud SQL
     port = 5432              # port PostgreSQL
     db_user = "postgres"     # nazwa użytkownika w PostgreSQL
-    db_pass = '()+;Cf#V?+`?jqp"'  # hasło do bazy
+    db_pass = VECTOR_PASSWORD  # hasło do bazy
     db_name = "postgres"     # nazwa bazy
 
     # Tworzymy poprawny connection string dla SQLAlchemy:

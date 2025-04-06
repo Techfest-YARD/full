@@ -6,10 +6,14 @@ from services.gemini_service import GeminiService
 import sqlalchemy
 from sqlalchemy import text
 import time
+from dotenv import load_dotenv
+import os
 
 # Załóżmy, że plik z tekstem
+load_dotenv()
 loader = TextLoader("xd.txt")
 documents = loader.load()
+VECTOR_PASSWORD = os.getenv("VECTOR_PASSWORD")
 
 text_splitter = RecursiveCharacterTextSplitter(chunk_size=500, chunk_overlap=50)
 docs = text_splitter.split_documents(documents)
@@ -96,7 +100,7 @@ def connect_via_public_ip() -> sqlalchemy.engine.base.Engine:
     host = "35.246.200.139"      # publiczny IP bazy
     port = 5432
     db_user = "postgres"
-    db_pass = '()+;Cf#V?+`?jqp"'
+    db_pass = VECTOR_PASSWORD
     db_name = "postgres"
 
     connection_url = f"postgresql+psycopg2://{db_user}:{db_pass}@{host}:{port}/{db_name}"
