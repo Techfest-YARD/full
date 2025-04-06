@@ -8,6 +8,7 @@ from sqlalchemy import text
 import time
 from dotenv import load_dotenv
 import os
+import re
 
 # Załóżmy, że plik z tekstem
 load_dotenv()
@@ -71,6 +72,26 @@ Here is the conversation history so far:
 
 We are in round {round}.
 Please continue the conversation by asking a follow-up question or giving feedback to encourage the student to elaborate or give examples.
+"""
+)
+
+prompt_template_test = PromptTemplate(
+    input_variables=["context"],
+    template="""
+You are an AI tutor. Based on the following educational content, generate a multiple-choice test in JSON format.
+Each question must be an object with the following keys:
+- "Question": The question text.
+- "AnswerA": Option A.
+- "AnswerB": Option B.
+- "AnswerC": Option C.
+- "AnswerD": Option D.
+- "CorrectAnswer": A single letter (A, B, C, or D) representing the correct answer.
+- "Explanation": A short explanation for the correct answer.
+
+Output a JSON array containing such objects.
+
+CONTENT:
+{context}
 """
 )
 
@@ -231,3 +252,68 @@ class RagPipelineService:
                 "error": str(e)
             })
             return ["General Topic: Review the material"]
+        
+async def generate_test(self, query: str) -> list:
+    """
+    Generuje test ABCD (w formacie JSON) na podstawie kontekstu pobranego z bazy.
+    """
+    try:
+        start = time.time()
+        # Pobierz kontekst z bazy
+        context = self._find_context(query)
+        
+        # Używamy prompt_template_test, aby wygenerować test
+        prompt = prompt_template_test.format(context=context)
+        response = await self.llm.get_answear(prompt)
+        end = time.time()
+
+        self.logger.log_llm_call({
+            "query": query,
+            "prompt": prompt,
+            "response_length": len(response),
+            "context_length": len(context),
+            "duration_ms": int((end - start) * 1000),
+            "source": "gemini_llm_generate_test",
+            "error": None
+        })
+
+        # Jeśli response jest ciągiem, usuń znaczniki Markdown, jeśli występują
+        if isinstance(response, str):
+            response = re.sub(r"^```json\s*", "", response)
+            response = re.sub(r"\s*```$", "", response).strip()
+
+        # Próba sparsowania oczyszczonej odpowiedzi jako JSON
+        try:
+            test_data = json.loads(response)
+            return test_data
+        except Exception as json_e:
+            self.logger.log_llm_call({
+                "query": query,
+                "prompt": prompt,
+                "response_length": len(response),
+                "context_length": len(context),
+                "duration_ms": int((end - start) * 1000),
+                "source": "gemini_llm_generate_test",
+                "error": f"JSON parsing error: {str(json_e)}"
+            })
+            # W razie błędu zwracamy przykładowy komunikat
+            return [{
+                "Question": "Error generating test.",
+                "AnswerA": "",
+                "AnswerB": "",
+                "AnswerC": "",
+                "AnswerD": "",
+                "CorrectAnswer": "",
+                "Explanation": "Failed to parse generated test."
+            }]
+    except Exception as e:
+        self.logger.log_llm_call({
+            "query": query,
+            "prompt": "",
+            "response_length": 0,
+            "context_length": 0,
+            "duration_ms": 0,
+            "source": "gemini_llm_generate_test",
+            "error": str(e)
+        })
+        raise

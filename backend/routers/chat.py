@@ -32,11 +32,19 @@ async def curious_child_chat(prompt: str = Query(..., min_length=1)):
         return JSONResponse(status_code=500, content={"error": str(e)})
     
 @router.get("/gemini/generate_topics")
-async def curious_child_chat(prompt: str = Query(..., min_length=1)):
+async def generate_topics(prompt: str = Query(..., min_length=1)):
     try:
         answer = await  pipeline.generate_topics_from_context(prompt)
         return {"response": answer}
     except Exception as e:
         # logger.exception("Error in curious_child RAG mode")
         return JSONResponse(status_code=500, content={"error": str(e)})
-
+    
+@router.get("/test")
+async def generate_test(prompt: str = Query(..., min_length=1)):
+    try:
+        answer = await  pipeline.generate_test(prompt)
+        return {"response": answer}
+    except Exception as e:
+        # logger.exception("Error in curious_child RAG mode")
+        return JSONResponse(status_code=500, content={"error": str(e)})
