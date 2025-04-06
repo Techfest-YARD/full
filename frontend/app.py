@@ -20,7 +20,7 @@ if "user" not in st.session_state:
 if "oauth_state" not in st.session_state:
     st.session_state.oauth_state = None
 
-# --- Automatic Code Retrieval / Mocking for Google OAuth ---
+# --- Automatic Code Retrieval / Mocking ---
 query_params = st.query_params  # st.query_params is a property
 if "code" in query_params and st.session_state.user is None:
     code = query_params["code"][0]
@@ -40,7 +40,10 @@ if "code" in query_params and st.session_state.user is None:
         st.session_state.user = user_info
         # Optionally update the URL to indicate login status.
         st.set_query_params(logged_in="true")
-        st.experimental_rerun()  # Force a rerun so that the UI updates.
+        try:
+            st.experimental_rerun()
+        except AttributeError:
+            st.stop()
     except Exception as e:
         st.error("Error during OAuth token retrieval: " + str(e))
         st.set_query_params()
@@ -76,7 +79,7 @@ with top_right.container():
             )
             authorization_url, state = oauth.create_authorization_url(AUTHORIZATION_ENDPOINT)
             st.session_state.oauth_state = state
-            # Use an anchor tag with target="_self" to force same-window navigation.
+            # Force same-window redirect with target="_self"
             login_link = f'<a href="{authorization_url}" target="_self">Kliknij tutaj aby się zalogować</a>'
             st.markdown(login_link, unsafe_allow_html=True)
     else:
@@ -105,10 +108,10 @@ st.markdown("""
     """, unsafe_allow_html=True)
 
 with st.container():
-    st.markdown("<div class='credentials-login'><h3>Logowanie (Kredencje)</h3>", unsafe_allow_html=True)
+    st.markdown("<div class='credentials-login'><h3>Logowanie</h3>", unsafe_allow_html=True)
     username = st.text_input("Login", key="cred_username")
     password = st.text_input("Hasło", type="password", key="cred_password")
-    if st.button("Zaloguj (Kredencje)", key="cred_login"):
+    if st.button("Zaloguj", key="cred_login"):
         if username == "Suser" and password == "Su":
             st.session_state.user = {
                 "name": "Suser",
@@ -117,7 +120,10 @@ with st.container():
                 "picture": "https://via.placeholder.com/150"
             }
             st.success("Zalogowano jako Super User")
-            st.experimental_rerun()
+            try:
+                st.experimental_rerun()
+            except AttributeError:
+                st.stop()
         elif username == "Użytkownik" and password == "u":
             st.session_state.user = {
                 "name": "Użytkownik",
@@ -126,7 +132,10 @@ with st.container():
                 "picture": "https://via.placeholder.com/150"
             }
             st.success("Zalogowano jako Użytkownik")
-            st.experimental_rerun()
+            try:
+                st.experimental_rerun()
+            except AttributeError:
+                st.stop()
         else:
             st.error("Nieprawidłowe dane logowania.")
     st.markdown("</div>", unsafe_allow_html=True)
