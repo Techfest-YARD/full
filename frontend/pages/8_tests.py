@@ -1,9 +1,12 @@
 import streamlit as st
+import json
+import logging
+from connectors.ApiBackend import ApiBackend  # Upewnij się, że ścieżka jest poprawna
 
-# Must be the first Streamlit command
-st.set_page_config(page_title="GenAI Mock Quiz", page_icon="✅", layout="wide")
+# Konfiguracja strony
+st.set_page_config(page_title="GenAI Test Quiz", page_icon="✅", layout="wide")
 
-# --- Custom CSS to Make the Quiz Look Nice ---
+# --- Custom CSS ---
 st.markdown("""
 <style>
 .question-box {
@@ -12,13 +15,6 @@ st.markdown("""
     padding: 20px;
     border-radius: 10px;
     width: 600px;
-}
-.answer-box {
-    background-color: #ffffff;
-    margin: 10px 0;
-    padding: 15px;
-    border-radius: 5px;
-    border: 1px solid #ddd;
 }
 .explanation-box {
     background-color: #e6f7ff;
@@ -31,153 +27,141 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-# --- Mock JSON Data: 5 Questions with Multiple Correct Answers ---
-MOCK_QUESTIONS = [
-    {
-        "Question": "1. What is Git?",
-        "AnswerA": "A type of programming language",
-        "AnswerB": "A distributed version control system",
-        "AnswerC": "A code linter for Python",
-        "AnswerD": "A task scheduling tool",
-        "CorrectAnswers": ["B"],
-        "Explanation": "Git is a distributed version control system."
-    },
-    {
-        "Question": "2. Which of the following are Git commands?",
-        "AnswerA": "git commit",
-        "AnswerB": "npm install",
-        "AnswerC": "git push",
-        "AnswerD": "apt-get update",
-        "CorrectAnswers": ["A", "C"],
-        "Explanation": "'git commit' and 'git push' are valid Git commands. The others belong to different tools."
-    },
-    {
-        "Question": "3. Which statements are true about Git branching?",
-        "AnswerA": "Branches allow you to work on different features in parallel",
-        "AnswerB": "You can only have one branch at a time",
-        "AnswerC": "Merging branches lets you integrate changes",
-        "AnswerD": "Branches are always stored remotely",
-        "CorrectAnswers": ["A", "C"],
-        "Explanation": "Branches are local by default and can be used in parallel. Merging integrates changes from one branch into another."
-    },
-    {
-        "Question": "4. Which Git command shows the history of commits?",
-        "AnswerA": "git status",
-        "AnswerB": "git log",
-        "AnswerC": "git revert",
-        "AnswerD": "git show",
-        "CorrectAnswers": ["B"],
-        "Explanation": "'git log' displays the commit history."
-    },
-    {
-        "Question": "5. Which of the following could happen if you never commit your changes?",
-        "AnswerA": "You might lose important modifications if you switch branches",
-        "AnswerB": "All changes are automatically tracked and saved",
-        "AnswerC": "Your changes won't be in the repository history",
-        "AnswerD": "You can't stage new changes",
-        "CorrectAnswers": ["A", "C"],
-        "Explanation": "Without commits, you can lose work by switching branches and your changes won't be recorded in the repo's history."
-    }
-]
+logger = logging.getLogger(__name__)
+logger.setLevel(logging.INFO)
 
-# --- Session State Initialization ---
+# Inicjalizacja serwisu backendowego
+backend = ApiBackend()
+
+# --- Inicjalizacja stanu sesji ---
+if "test_questions" not in st.session_state:
+    st.session_state.test_questions = None
 if "user_answers" not in st.session_state:
-    # Create an empty dict to hold user answers for each question
-    st.session_state.user_answers = {str(i): set() for i in range(len(MOCK_QUESTIONS))}
+    st.session_state.user_answers = {}
 if "quiz_submitted" not in st.session_state:
     st.session_state.quiz_submitted = False
 
+def generate_test_from_backend():
+    test_questions = backend.generate_test()
+    # Jeśli otrzymany wynik jest ciągiem znaków, sprawdź czy nie jest pusty
+    if isinstance(test_questions, str):
+        if test_questions.strip() == "":
+            st.error("Otrzymano pusty ciąg testowych pytań.")
+            test_questions = []
+        else:
+            try:
+                test_questions = json.loads(test_questions)
+            except Exception as e:
+                st.error("Nie udało się sparsować pytań testowych: " + str(e))
+                test_questions = []
+    st.session_state.test_questions = test_questions
+    # Inicjalizacja odpowiedzi dla każdego pytania (jako None)
+    for i in range(len(test_questions)):
+        st.session_state.user_answers[str(i)] = None
 
-def display_question(question_data: dict, index: int):
+def display_test_generation():
     """
-    Display a single question in a rectangular box, along with four checkboxes
-    for possible answers. The user can select multiple answers.
+    Interfejs generowania testu – użytkownik wpisuje prompt lub korzysta z domyślnego,
+    a po kliknięciu przycisku wywoływana jest funkcja generująca test.
     """
+    st.header("Generate a Test")
+    prompt = st.text_input("Enter a prompt for generating the test:",
+                           value="Please generate a multiple-choice test on Git.")
+    if st.button("Generate Test"):
+        generate_test_from_backend()
+        st.rerun()
+
+def display_question(question_data, index: int):
+    """
+    Wyświetla pojedyncze pytanie wraz z opcjami odpowiedzi.
+    Jeśli question_data jest ciągiem, próbuje go sparsować jako JSON.
+    """
+    # Jeśli question_data jest stringiem i nie jest pusty, spróbuj sparsować
+    if isinstance(question_data, str):
+        if question_data.strip() == "":
+            st.error("Pytanie jest puste.")
+            return
+        try:
+            question_data = json.loads(question_data)
+        except Exception as e:
+            st.error(f"Nie udało się sparsować pytania: {e}")
+            return
+
     question_id = str(index)
-    st.markdown(f"<div class='question-box'><strong>{question_data['Question']}</strong></div>", unsafe_allow_html=True)
-    
-    # Display 4 answer options in rectangular fields
-    answer_col = st.container()
-    with answer_col:
-        # For each answer, we create a unique key. The user can select multiple answers
-        # so we store them in st.session_state.user_answers[question_id] as a set of strings.
-        for letter in ["A", "B", "C", "D"]:
-            answer_text = question_data[f"Answer{letter}"]
-            # Create a checkbox
-            checked = letter in st.session_state.user_answers[question_id]
-            new_val = st.checkbox(
-                f"{letter}. {answer_text}",
-                key=f"q{question_id}_ans{letter}",
-                value=checked
-            )
-            # If checked, add it to the set of user answers; else remove
-            if new_val:
-                st.session_state.user_answers[question_id].add(letter)
-            else:
-                st.session_state.user_answers[question_id].discard(letter)
-
+    st.markdown(
+        f"<div class='question-box'><strong>{question_data['Question']}</strong></div>", 
+        unsafe_allow_html=True
+    )
+    options = {
+        "A": question_data.get("AnswerA", ""),
+        "B": question_data.get("AnswerB", ""),
+        "C": question_data.get("AnswerC", ""),
+        "D": question_data.get("AnswerD", "")
+    }
+    selected = st.radio(
+        f"Select one answer for question {index+1}:",
+        options=list(options.keys()),
+        format_func=lambda x: f"{x}. {options[x]}",
+        key=f"question_{question_id}"
+    )
+    st.session_state.user_answers[question_id] = selected
 
 def display_quiz(questions: list):
     """
-    Display all questions. 
-    If the quiz is already submitted, show the summary.
+    Jeśli quiz nie został przesłany, wyświetla wszystkie pytania.
+    Po przesłaniu wyświetla podsumowanie.
     """
-    # If the quiz hasn't been submitted yet, display each question
     if not st.session_state.quiz_submitted:
         st.header("Multiple-Choice Quiz")
-        st.write("Select the correct answers for each question below:")
+        st.write("Select the correct answer for each question below:")
         for i, q in enumerate(questions):
             display_question(q, i)
-        
         if st.button("Submit Answers"):
             st.session_state.quiz_submitted = True
+            st.rerun()
     else:
-        # Show summary
         display_summary(questions)
-
 
 def display_summary(questions: list):
     """
-    Display the final summary, showing each question with correct answers, 
-    the user's choices, and explanations.
+    Wyświetla podsumowanie quizu z wynikami – dla każdego pytania pokazuje odpowiedź użytkownika,
+    poprawną odpowiedź oraz wyjaśnienie.
     """
     st.header("Quiz Summary")
     correct_count = 0
     total_questions = len(questions)
-    
     for i, q in enumerate(questions):
         question_id = str(i)
-        user_choices = sorted(list(st.session_state.user_answers[question_id]))
-        correct_choices = sorted(list(q["CorrectAnswers"]))
-        # Check if user is correct
-        if user_choices == correct_choices:
+        user_choice = st.session_state.user_answers.get(question_id, "No answer")
+        correct_choice = q.get("CorrectAnswer", "N/A")
+        if user_choice == correct_choice:
             correct_count += 1
-        
-        # Show the question in a box
-        st.markdown(f"<div class='question-box'><strong>{q['Question']}</strong></div>", unsafe_allow_html=True)
-        st.write(f"**Your answers:** {user_choices if user_choices else 'No selection'}")
-        st.write(f"**Correct answers:** {correct_choices}")
-        
-        # Explanation in a separate box
-        st.markdown(f"<div class='explanation-box'><strong>Explanation:</strong> {q['Explanation']}</div>", unsafe_allow_html=True)
-    
+        st.markdown(
+            f"<div class='question-box'><strong>{q['Question']}</strong></div>", 
+            unsafe_allow_html=True
+        )
+        st.write(f"**Your answer:** {user_choice} ({q.get('Answer' + user_choice, '')})")
+        st.write(f"**Correct answer:** {correct_choice} ({q.get('Answer' + correct_choice, '')})")
+        st.markdown(
+            f"<div class='explanation-box'><strong>Explanation:</strong> {q.get('Explanation', '')}</div>", 
+            unsafe_allow_html=True
+        )
     st.write(f"**You got {correct_count} out of {total_questions} questions correct.**")
-    
-    # Button to let user reset and do it again
     if st.button("Try Again"):
-        for k in ["user_answers", "quiz_submitted"]:
-            if k in st.session_state:
-                del st.session_state[k]
-        # Force immediate rerun
-        st.experimental_rerun()
-
+        for key in ["test_questions", "user_answers", "quiz_submitted"]:
+            if key in st.session_state:
+                del st.session_state[key]
+        st.rerun()
 
 # --- MAIN PAGE ---
-st.title("GenAI Mock Quiz")
+st.title("GenAI Test Quiz")
 st.write("""
-A short multiple-choice test generated from a fixed mock dataset.
-Select all correct answers for each question, then click "Submit Answers" 
-to see your summary and explanations.
+This test is generated in real-time by an AI model.
+Click "Generate Test" to fetch a multiple-choice test from the backend,
+then answer the questions and view your results.
 """)
 
-display_quiz(MOCK_QUESTIONS)
+if st.session_state.test_questions is None:
+    display_test_generation()
+else:
+    display_quiz(st.session_state.test_questions)

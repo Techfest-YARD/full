@@ -1,10 +1,14 @@
 import streamlit as st
 import datetime
-
+from dotenv import load_dotenv
 from connectors.ApiBackend import ApiBackend
+import os
 
 backend = ApiBackend()
 
+load_dotenv()
+
+BACKEND_URL=os.getenv("BACKEND_URL")
 
 # --- Inline Learning Material ---
 context_data = """
@@ -37,17 +41,24 @@ def read_context(dummy_path: str) -> str:
     """
     return context_data.strip()
 
-def generate_topics(context: str) -> list:
+def fetch_generated_topics(prompt: str) -> list:
     """
-    Simulates a Gemini API call that extracts a list of topics from the context.
-    For demonstration, splits the context into sentences and takes up to 5 topics.
+    Wywołuje backendowy endpoint do generowania tematów na podstawie podanego promptu.
     """
-    sentences = [s.strip() for s in context.split('.') if s.strip()]
-    topics = [f"Topic {i+1}: {sentence}" for i, sentence in enumerate(sentences[:5])]
-    if not topics:
-        topics = ["General Topic: Review the material"]
-    return topics
-
+    params = {"prompt": prompt}
+    url = f"{BACKEND_URL}/gemini/generate_topics"
+    try:
+        response = requests.get(url, params=params)
+        response.raise_for_status()
+        topics = response.json().get("response", [])
+        if topics:
+            return topics
+        else:
+            return ["[Brak wygenerowanych tematów]"]
+    except Exception as e:
+        st.error(f"Błąd podczas pobierania tematów: {e}")
+        return [f"[Błąd: {e}]"]
+    
 def initialize_conversation(topic: str) -> str:
     """
     Initializes the conversation memory for a topic with a welcoming agent message.
@@ -97,9 +108,9 @@ def run_curious_child_chat():
     # If topics are not generated, show a button to generate them.
     if not st.session_state.topics:
         if st.button("Generate topics to discuss"):
-            context = read_context("dummy_path_not_used")
+            context = read_context("generate questions about python")
             if context:
-                topics = generate_topics(context)
+                topics = backend.generate_topics("generate questions about python")
                 st.session_state.topics = topics
                 st.session_state.current_topic_index = 0
                 st.session_state.conversation_history = {}
@@ -127,7 +138,7 @@ def run_curious_child_chat():
         # Append user's message.
         st.session_state.messages.append({"role": "user", "content": user_prompt})
         st.session_state.conversation_memory += f"User: {user_prompt}\n"
-        st.experimental_rerun()  # Refresh to display the new message
+        st.rerun()  # Refresh to display the new message
 
     # Process agent response if the last message is from the user.
     if st.session_state.messages and st.session_state.messages[-1]["role"] == "user":
@@ -148,7 +159,7 @@ def run_curious_child_chat():
                     st.session_state.messages.append({"role": "assistant", "content": st.session_state.conversation_memory})
                 else:
                     st.session_state.messages.append({"role": "assistant", "content": "All topics have been discussed!"})
-        st.experimental_rerun()
+        st.rerun()
 
     # If all topics are finished, show a summary and offer a restart.
     if st.session_state.current_topic_index >= len(st.session_state.topics):
@@ -160,7 +171,7 @@ def run_curious_child_chat():
             for key in ["messages", "topics", "current_topic_index", "round_count", "conversation_memory", "conversation_history"]:
                 if key in st.session_state:
                     del st.session_state[key]
-            st.experimental_rerun()
+            st.rerun()
 
     # Display gamified progress.
     progress = (st.session_state.current_topic_index / len(st.session_state.topics)) if st.session_state.topics else 0
